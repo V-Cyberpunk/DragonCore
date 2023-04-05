@@ -192,6 +192,19 @@ enum ArenaType
     ARENA_TYPE_5v5          = 5
 };
 
+enum BracketType
+{
+    ARENA_2 = 0,
+    ARENA_3 = 1,
+    ARENA_5 = 2,
+    RATED_BG = 3,
+    SKIRMISH_2 = 4,
+    SKIRMISH_3 = 5,
+    BRAWL_BATTLEGROUND = 6,
+    BRAWL_ARENA = 7,
+    MAX
+};
+
 enum BattlegroundStartingEvents
 {
     BG_STARTING_EVENT_NONE  = 0x00,

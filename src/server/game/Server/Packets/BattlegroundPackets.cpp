@@ -433,3 +433,12 @@ WorldPacket const* WorldPackets::Battleground::CapturePointRemoved::Write()
     _worldPacket << CapturePointGUID;
     return &_worldPacket;
 }
+
+WorldPacket const* WorldPackets::Battleground::JoinSkirmish::Read()
+{
+    JoinAsGroup = _worldPacket.ReadBool();
+    UnkBool = _worldPacket.ReadBool();
+    Roles = _worldPacket.ReadBit();
+    Bracket = (BracketType)_worldPacket.ReadBit();
+}
+
