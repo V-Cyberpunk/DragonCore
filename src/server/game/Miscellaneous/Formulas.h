@@ -30,19 +30,27 @@ namespace Trinity
 {
     inline uint32 GetExpansionForLevel(uint32 level)
     {
-        if (level < 60)
-            return EXPANSION_CLASSIC;
-        else if (level < 70)
-            return EXPANSION_THE_BURNING_CRUSADE;
-        else if (level < 80)
+        if (level < 30)
+           return EXPANSION_CLASSIC;
+       else if (level < 30)
+           return EXPANSION_THE_BURNING_CRUSADE;
+       else if (level < 30)
             return EXPANSION_WRATH_OF_THE_LICH_KING;
-        else if (level < 85)
+       else if (level < 35)
             return EXPANSION_CATACLYSM;
-        else if (level < 90)
+       else if (level < 35)
             return EXPANSION_MISTS_OF_PANDARIA;
-        else if (level < 100)
+       else if (level < 40)
             return EXPANSION_WARLORDS_OF_DRAENOR;
-        else
+       else if (level < 45)
+            return EXPANSION_LEGION;
+       else if (level < 50)
+            return EXPANSION_BATTLE_FOR_AZEROTH;
+       else if (level < 60)
+            return EXPANSION_SHADOWLANDS;
+       else if (level < 70)
+            return EXPANSION_DRAGONFLIGHT;
+       else
             return CURRENT_EXPANSION;
     }
 
