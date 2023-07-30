@@ -7266,7 +7266,7 @@ int32 Unit::SpellHealingBonusDone(Unit* victim, SpellInfo const* spellProto, int
         if (spellProto->Id == 50464)
             DoneTotalMod = float(spellProto->GetEffect(EFFECT_1).CalcValue() / 100.0f);
 
-        DoneTotal += int32(CalculatePct(healamount, float(harmonyEffect->GetAmount() * healingPeriodicCount) * DoneTotalMod));
+        DoneTotal += int32(CalculatePct(int32(healamount), float(harmonyEffect->GetAmount() * healingPeriodicCount) * DoneTotalMod));
     }
 
     // Done fixed damage bonus auras
