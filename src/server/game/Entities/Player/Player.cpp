@@ -24762,6 +24762,8 @@ void Player::SendInitialPacketsAfterAddToMap()
 {
     UpdateVisibilityForPlayer();
 
+    SetPlayerLocalFlag(PLAYER_LOCAL_FLAG_ACCOUNT_SECURED);
+
     // Send map wide vignettes before UpdateZone, that will send zone wide vignettes
     // But first send on new map will wipe all vignettes on client
     {
