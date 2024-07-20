@@ -6424,9 +6424,10 @@ void AuraEffect::HandleAuraActAsControlZone(AuraApplication const* aurApp, uint8
     if (!(mode & AURA_EFFECT_HANDLE_REAL))
         return;
 
+    Unit* auraOwner = aurApp->GetTarget();
     if (!apply)
     {
-        aurApp->GetTarget()->RemoveControlZone();
+        auraOwner->RemoveGameObject(GetSpellInfo()->Id, true);
         return;
     }
 
@@ -6443,7 +6444,8 @@ void AuraEffect::HandleAuraActAsControlZone(AuraApplication const* aurApp, uint8
         return;
     }
 
-    aurApp->GetTarget()->CreateControlZone(gameobjectTemplate);
+    if (GameObject* controlZone = auraOwner->SummonGameObject(gameobjectTemplate->entry, auraOwner->GetPosition(), QuaternionData::fromEulerAnglesZYX(aurApp->GetTarget()->GetOrientation(), 0.f, 0.f), 24h, GO_SUMMON_TIMED_OR_CORPSE_DESPAWN))
+        controlZone->SetSpellId(GetSpellInfo()->Id);
 }
 
 template TC_GAME_API void AuraEffect::GetTargetList(std::list<Unit*>&) const;
