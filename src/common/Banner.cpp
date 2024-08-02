@@ -22,16 +22,20 @@
 void Trinity::Banner::Show(char const* applicationName, void(*log)(char const* text), void(*logExtraInfo)())
 {
     log(Trinity::StringFormat("{} ({})", GitRevision::GetFullVersion(), applicationName).c_str());
-    log(R"(<Ctrl-C> to stop.)" "\n");
-    log(R"( ______                       __)");
-    log(R"(/\__  _\       __          __/\ \__)");
-    log(R"(\/_/\ \/ _ __ /\_\    ___ /\_\ \, _\  __  __)");
-    log(R"(   \ \ \/\`'__\/\ \ /' _ `\/\ \ \ \/ /\ \/\ \)");
-    log(R"(    \ \ \ \ \/ \ \ \/\ \/\ \ \ \ \ \_\ \ \_\ \)");
-    log(R"(     \ \_\ \_\  \ \_\ \_\ \_\ \_\ \__\\/`____ \)");
-    log(R"(      \/_/\/_/   \/_/\/_/\/_/\/_/\/__/ `/___/> \)");
-    log(R"(                                 C O R E  /\___/)");
-    log(R"(http://TrinityCore.org                    \/__/)" "\n");
+    log(R"(<Ctrl-C> to stop.)");
+    log(R"(  ____                              )");
+    log(R"( |  _ \ _ __ __ _  __ _  ___  _ __  )");
+    log(R"( | | | | '__/ _` |/ _` |/ _ \| '_ \ )");
+    log(R"( | |_| | | | (_| | (_| | (_) | | | |)");
+    log(R"( |____/|_|  \__,_|\__, |\___/|_| |_|)");
+    log(R"(   ____           |___/             )");
+    log(R"(  / ___|___  _ __ ___               )");
+    log(R"( | |   / _ \| '__/ _ \              )");
+    log(R"( | |__| (_) | | |  __/              )");
+    log(R"(  \____\___/|_|  \___|              )");
+    log(R"(                                    )");
+    log(R"(World of Warcraft - Dragonflight 10.2.7 Server)");
+    log(R"(                                    )");
 
     if (logExtraInfo)
         logExtraInfo();
