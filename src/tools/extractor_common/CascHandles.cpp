@@ -21,11 +21,6 @@
 #include "Resolver.h"
 #include "TACTKeys.h"
 #include <CascLib.h>
-#include <boost/asio/streambuf.hpp>
-#include <boost/asio/read.hpp>
-#include <boost/asio/read_until.hpp>
-#include <boost/asio/write.hpp>
-#include <boost/asio/ssl/stream.hpp>
 #include <boost/filesystem/operations.hpp>
 
 char const* CASC::HumanReadableCASCError(uint32 error)
