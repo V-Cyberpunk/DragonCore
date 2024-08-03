@@ -1,3 +1,13 @@
+# ![logo](logo.png) <br> DragonCore
+
+DragonCore is a derivative of the last Dragonflight revision from TrinityCore and last Dragonflight RetailCore DB!<br>
+Target version is 10.2.7.<br>
+Data, Launcher and DB are in the Release section.<br><br>
+
+Below is the original TrinityCore Readme:
+
+--------------
+
 # ![logo](https://community.trinitycore.org/public/style_images/1_trinitycore.png) TrinityCore (master)
 
 [![Average time to resolve an issue](https://isitmaintained.com/badge/resolution/TrinityCore/TrinityCore.svg)](https://isitmaintained.com/project/TrinityCore/TrinityCore "Average time to resolve an issue") [![Percentage of issues still open](https://isitmaintained.com/badge/open/TrinityCore/TrinityCore.svg)](https://isitmaintained.com/project/TrinityCore/TrinityCore "Percentage of issues still open")
