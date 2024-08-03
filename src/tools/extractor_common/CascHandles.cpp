@@ -15,9 +15,11 @@
  * with this program. If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <string>
 #include "CascHandles.h"
 #include "IoContext.h"
 #include "Resolver.h"
+#include "TACTKeys.h"
 #include <CascLib.h>
 #include <boost/asio/streambuf.hpp>
 #include <boost/asio/read.hpp>
@@ -25,7 +27,6 @@
 #include <boost/asio/write.hpp>
 #include <boost/asio/ssl/stream.hpp>
 #include <boost/filesystem/operations.hpp>
-#include <string>
 
 char const* CASC::HumanReadableCASCError(uint32 error)
 {
@@ -54,101 +55,6 @@ char const* CASC::HumanReadableCASCError(uint32 error)
 
 namespace
 {
-    Optional<std::string> DownloadFile(std::string const& serverName, int16 port, std::string const& getCommand)
-    {
-        boost::system::error_code error;
-        Trinity::Asio::IoContext ioContext;
-        boost::asio::ssl::context sslContext(boost::asio::ssl::context::sslv23);
-        sslContext.set_options(boost::asio::ssl::context::no_sslv2, error);
-        sslContext.set_options(boost::asio::ssl::context::no_sslv3, error);
-        sslContext.set_options(boost::asio::ssl::context::no_tlsv1, error);
-        sslContext.set_options(boost::asio::ssl::context::no_tlsv1_1, error);
-        sslContext.set_default_verify_paths(error);
-
-        Trinity::Asio::Resolver resolver(ioContext);
-
-        Optional<boost::asio::ip::tcp::endpoint> endpoint = resolver.Resolve(boost::asio::ip::tcp::v4(), serverName, std::to_string(port));
-        if (!endpoint)
-            return {};
-
-        boost::asio::ssl::stream<boost::asio::ip::tcp::socket> socket(ioContext, sslContext);
-        socket.set_verify_mode(boost::asio::ssl::verify_none, error);
-        if (error)
-            return {};
-
-        socket.lowest_layer().connect(*endpoint, error);
-        if (error)
-            return {};
-
-        if (!SSL_set_tlsext_host_name(socket.native_handle(), serverName.c_str()))
-            return {};
-
-        socket.handshake(boost::asio::ssl::stream_base::client, error);
-        if (error)
-            return {};
-
-        boost::asio::streambuf request;
-        std::ostream request_stream(&request);
-
-        request_stream << "GET " << getCommand << " HTTP/1.0\r\n";
-        request_stream << "Host: " << serverName << "\r\n";
-        request_stream << "Connection: close\r\n\r\n";
-
-        // Send the request.
-        boost::asio::write(socket, request);
-
-        // Read the response status line.
-        boost::asio::streambuf response;
-        boost::asio::read_until(socket, response, "\r\n", error);
-        if (error)
-        {
-            printf("Downloading tact key list failed to read HTTP response status %s", error.message().c_str());
-            return {};
-        }
-
-        // Check that response is OK.
-        std::string http_version;
-        uint32 status_code;
-        std::string status_message;
-        std::istream response_stream(&response);
-
-        response_stream >> http_version;
-        response_stream >> status_code;
-        std::getline(response_stream, status_message);
-
-        if (status_code != 200)
-        {
-            printf("Downloading tact key list failed with server response %u %s", status_code, status_message.c_str());
-            return {};
-        }
-
-        // Read the response headers, which are terminated by a blank line.
-        boost::asio::read_until(socket, response, "\r\n\r\n");
-        if (error)
-        {
-            printf("Downloading tact key list failed to read HTTP response headers %s", error.message().c_str());
-            return {};
-        }
-
-        // Process the response headers.
-        std::string header;
-        while (std::getline(response_stream, header) && header != "\r")
-        {
-        }
-
-        std::stringstream rawBody;
-
-        // Write whatever content we already have to output.
-        if (response.size() > 0)
-            rawBody << &response;
-
-        // Read until EOF, writing data to output as we go.
-        while (boost::asio::read(socket, response, boost::asio::transfer_at_least(1), error))
-            rawBody << &response;
-
-        return rawBody.str();
-    }
-
     template<typename T>
     bool GetStorageInfo(HANDLE storage, CASC_STORAGE_INFO_CLASS storageInfoClass, T* value)
     {
@@ -166,11 +72,8 @@ Storage::Storage(HANDLE handle) : _handle(handle)
 {
 }
 
-bool Storage::LoadOnlineTactKeys()
+bool Storage::LoadTactKeys()
 {
-    // attempt to download only once, not every storage opening
-    static Optional<std::string> const tactKeys = DownloadFile("raw.githubusercontent.com", 443, "/wowdev/TACTKeys/master/WoW.txt");
-
     return tactKeys && CascImportKeysFromString(_handle, tactKeys->c_str());
 }
 
@@ -201,8 +104,8 @@ Storage* Storage::Open(boost::filesystem::path const& path, uint32 localeMask, c
     printf("Opened casc storage '%s'\n", path.string().c_str());
     Storage* storage = new Storage(handle);
 
-    if (!storage->LoadOnlineTactKeys())
-        printf("Failed to load additional online encryption keys, some files might not be extracted.\n");
+    if (!storage->LoadTactKeys())
+        printf("Failed to load additional encryption keys, some files might not be extracted.\n");
 
     return storage;
 }
@@ -241,8 +144,8 @@ Storage* Storage::OpenRemote(boost::filesystem::path const& path, uint32 localeM
     printf("Opened remote casc storage '%s'\n", path.string().c_str());
     Storage* storage = new Storage(handle);
 
-    if (!storage->LoadOnlineTactKeys())
-        printf("Failed to load additional online encryption keys, some files might not be extracted.\n");
+    if (!storage->LoadTactKeys())
+        printf("Failed to load additional encryption keys, some files might not be extracted.\n");
 
     return storage;
 }
