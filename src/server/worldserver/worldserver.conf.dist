@@ -1,5 +1,5 @@
 ################################################
-# Trinity Core World Server configuration file #
+# Dragon Core World Server configuration file #
 ################################################
 [worldserver]
 
@@ -1326,9 +1326,9 @@ FlashAtStart = 1
 #    Motd
 #        Description: Message of the Day, displayed at login. Use '@' for a newline.
 #        Example:     "Welcome to John's Server!@This server is proud to be powered by Trinity Core."
-#        Default:     "Welcome to a Trinity Core server."
+#        Default:     "Welcome to a Dragonflight DragonCore server."
 
-Motd = "Welcome to a Trinity Core server."
+Motd = "Welcome to a Dragonflight DragonCore server."
 
 #
 #    Server.LoginInfo
