@@ -3585,6 +3585,7 @@ LOCK TABLES `updates_include` WRITE;
 /*!40000 ALTER TABLE `updates_include` DISABLE KEYS */;
 INSERT INTO `updates_include` VALUES
 ('$/sql/custom/characters','RELEASED'),
+('$/sql/old/characters','ARCHIVED'),
 ('$/sql/updates/characters','RELEASED');
 /*!40000 ALTER TABLE `updates_include` ENABLE KEYS */;
 UNLOCK TABLES;

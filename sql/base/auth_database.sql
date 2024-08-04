@@ -2481,6 +2481,7 @@ LOCK TABLES `updates_include` WRITE;
 /*!40000 ALTER TABLE `updates_include` DISABLE KEYS */;
 INSERT INTO `updates_include` VALUES
 ('$/sql/custom/auth','RELEASED'),
+('$/sql/old/auth','ARCHIVED'),
 ('$/sql/updates/auth','RELEASED');
 /*!40000 ALTER TABLE `updates_include` ENABLE KEYS */;
 UNLOCK TABLES;
