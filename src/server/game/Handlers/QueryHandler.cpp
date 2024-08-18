@@ -330,4 +330,6 @@ void WorldSession::HandleQueryRealmName(WorldPackets::Query::QueryRealmName& que
     }
     else
         realmQueryResponse.LookupState = RESPONSE_FAILURE;
+
+    SendPacket(realmQueryResponse.Write());
 }
