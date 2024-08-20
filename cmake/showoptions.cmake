@@ -1,9 +1,9 @@
 # output generic information about the core and buildtype chosen
 message("")
-message("* TrinityCore revision   : ${rev_hash} ${rev_date} (${rev_branch} branch)")
+message("* DragonCore revision   : ${rev_hash} ${rev_date} (${rev_branch} branch)")
 get_property(IS_MULTI_CONFIG GLOBAL PROPERTY GENERATOR_IS_MULTI_CONFIG)
 if(NOT IS_MULTI_CONFIG)
-  message("* TrinityCore buildtype  : ${CMAKE_BUILD_TYPE}")
+  message("* DragonCore buildtype  : ${CMAKE_BUILD_TYPE}")
 endif()
 message("")
 
