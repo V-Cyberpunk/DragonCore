@@ -1775,7 +1775,6 @@ CREATE TABLE `character_trait_entry` (
   `traitNodeId` int NOT NULL,
   `traitNodeEntryId` int NOT NULL,
   `rank` int NOT NULL DEFAULT '0',
-  `grantedRanks` int NOT NULL DEFAULT '0',
   PRIMARY KEY (`guid`,`traitConfigId`,`traitNodeId`,`traitNodeEntryId`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
