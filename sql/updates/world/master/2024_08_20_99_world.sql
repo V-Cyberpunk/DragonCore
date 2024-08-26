@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 DROP TABLE IF EXISTS `ui_map_quest_lines`;
 CREATE TABLE `ui_map_quest_lines` (
   `UiMapId` INT UNSIGNED NOT NULL,
@@ -1119,3 +1120,8 @@ INSERT INTO `ui_map_quests` (`UIMapId`, `QuestId`, `VerifiedBuild`) VALUES
 (371, 30134, 54988), -- Wild Things
 (1536, 59867, 54988), -- WANTED: Appraiser Vix
 (1536, 57301, 54988); -- Callous Concoctions
+=======
+DELETE FROM `spell_script_names` WHERE `ScriptName`='spell_rog_improved_shiv';
+INSERT INTO `spell_script_names` (`spell_id`, `ScriptName`) VALUES
+(5938, 'spell_rog_improved_shiv');
+>>>>>>> Scripts/Spells: Implement rogue talent Improved Shiv (#30147)
