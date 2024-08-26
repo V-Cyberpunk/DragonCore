@@ -4,16 +4,16 @@ SET @OGUID := 9003984;
 -- Creature
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+4;
 INSERT INTO `creature` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnDifficulties`, `PhaseId`, `PhaseGroup`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `wander_distance`, `currentwaypoint`, `MovementType`, `npcflag`, `unit_flags`, `unit_flags2`, `unit_flags3`, `VerifiedBuild`) VALUES
-(@CGUID+0, 206596, 0, 1519, 5154, '0', 0, 0, 0, 0, -8907.33203125, 968.248291015625, 117.64715576171875, 4.032818317413330078, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55939), -- Delivery Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 413842 - Carrying Papers [DNT])
-(@CGUID+1, 206381, 0, 1519, 5154, '0', 0, 0, 0, 0, -8908.5537109375, 964.857666015625, 117.686553955078125, 1.916299939155578613, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55939), -- Notary Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 343476 - Taking Notes)
-(@CGUID+2, 206596, 0, 1519, 5154, '0', 0, 0, 0, 0, -8910.0576171875, 966.3038330078125, 117.564208984375, 0, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55939), -- Delivery Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 413842 - Carrying Papers [DNT])
-(@CGUID+3, 204198, 0, 1519, 5154, '0', 21679, 0, 0, 0, -8911.751953125, 963.6632080078125, 117.4807586669921875, 2.982371807098388671, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55939), -- Assistant Phineas (Area: Mage Quarter - Difficulty: 0) CreateObject1
-(@CGUID+4, 207684, 0, 1519, 5154, '0', 21679, 0, 0, 0, -8910.375, 959.20831298828125, 117.60601806640625, 3.685421943664550781, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55939); -- Stagecoach (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: )
+(@CGUID+0, 206596, 0, 1519, 5154, '0', 0, 0, 0, 0, -8907.33203125, 968.248291015625, 117.64715576171875, 4.032818317413330078, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55664), -- Delivery Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 413842 - Carrying Papers [DNT])
+(@CGUID+1, 206381, 0, 1519, 5154, '0', 0, 0, 0, 0, -8908.5537109375, 964.857666015625, 117.686553955078125, 1.916299939155578613, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55664), -- Notary Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 343476 - Taking Notes)
+(@CGUID+2, 206596, 0, 1519, 5154, '0', 0, 0, 0, 0, -8910.0576171875, 966.3038330078125, 117.564208984375, 0, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55664), -- Delivery Imp (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: 413842 - Carrying Papers [DNT])
+(@CGUID+3, 204198, 0, 1519, 5154, '0', 21679, 0, 0, 0, -8911.751953125, 963.6632080078125, 117.4807586669921875, 2.982371807098388671, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55664), -- Assistant Phineas (Area: Mage Quarter - Difficulty: 0) CreateObject1
+(@CGUID+4, 207684, 0, 1519, 5154, '0', 21679, 0, 0, 0, -8910.375, 959.20831298828125, 117.60601806640625, 3.685421943664550781, 120, 0, 0, 0, NULL, NULL, NULL, NULL, 55664); -- Stagecoach (Area: Mage Quarter - Difficulty: 0) CreateObject1 (Auras: )
 
 -- GameObject
 DELETE FROM `gameobject` WHERE `guid` = @OGUID+0;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnDifficulties`, `PhaseId`, `PhaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
-(@OGUID+0, 403736, 0, 1519, 5154, '0', 0, 0, -8908.216796875, 966.451416015625, 117.708282470703125, 0, 0, 0, 0, 1, 120, 255, 1, 55939); -- Pile of Letters (Area: Mage Quarter - Difficulty: 0) CreateObject1
+(@OGUID+0, 403736, 0, 1519, 5154, '0', 0, 0, -8908.216796875, 966.451416015625, 117.708282470703125, 0, 0, 0, 0, 1, 120, 255, 1, 55664); -- Pile of Letters (Area: Mage Quarter - Difficulty: 0) CreateObject1
 
 -- Template
 UPDATE `creature_template` SET `faction`=35, `BaseAttackTime`=2000, `unit_flags2`=2048 WHERE `entry`=206381; -- Notary Imp
@@ -33,7 +33,7 @@ DELETE FROM `phase_name` WHERE `ID` = 21679;
 INSERT INTO `phase_name` (`ID`, `Name`) VALUES
 (21679, 'Cosmetic - See Assistant Phineas and Stagecoach');
 
-DELETE FROM `phase_area` WHERE `PhaseId` = 21679; 
+DELETE FROM `phase_area` WHERE `PhaseId` = 21679;
 INSERT INTO `phase_area` (`AreaId`, `PhaseId`, `Comment`) VALUES
 (1519, 21679, 'Cosmetic - See Assistant Phineas and Stagecoach');
 
@@ -49,22 +49,22 @@ INSERT INTO `npc_spellclick_spells` (`npc_entry`, `spell_id`, `cast_flags`, `use
 (207684, 408907, 1, 0);
 
 DELETE FROM `conditions` WHERE (`SourceTypeOrReferenceId` = 18) AND (`SourceGroup` IN (207684));
-INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `ConditionStringValue1`, `NegativeCondition`, `Comment`) VALUES 
+INSERT INTO `conditions` (`SourceTypeOrReferenceId`, `SourceGroup`, `SourceEntry`, `SourceId`, `ElseGroup`, `ConditionTypeOrReference`, `ConditionTarget`, `ConditionValue1`, `ConditionValue2`, `ConditionValue3`, `ConditionStringValue1`, `NegativeCondition`, `Comment`) VALUES
 (18, 207684, 408907, 0, 0, 9, 0, 75538, 0, 0, '', 0, 'Clicker has quest Beginning Impositions (75538) active'),
 (18, 207684, 408907, 0, 1, 51, 0, 5, 14505, 0, '', 0, 'Clicker is TYPEID_UNIT, entry is 14505');
 
 -- Difficulty
-UPDATE `creature_template_difficulty` SET `StaticFlags1`=268435456, `VerifiedBuild`=55939 WHERE (`Entry`=206381 AND `DifficultyID`=0); -- 206381 (Notary Imp) - CanSwim
-UPDATE `creature_template_difficulty` SET `StaticFlags1`=268435456, `VerifiedBuild`=55939 WHERE (`Entry`=206596 AND `DifficultyID`=0); -- 206596 (Delivery Imp) - CanSwim
+UPDATE `creature_template_difficulty` SET `StaticFlags1`=268435456, `VerifiedBuild`=55664 WHERE (`Entry`=206381 AND `DifficultyID`=0); -- 206381 (Notary Imp) - CanSwim
+UPDATE `creature_template_difficulty` SET `StaticFlags1`=268435456, `VerifiedBuild`=55664 WHERE (`Entry`=206596 AND `DifficultyID`=0); -- 206596 (Delivery Imp) - CanSwim
 
 -- Quest
 DELETE FROM `quest_description_conditional` WHERE (`QuestId`=75538 AND `PlayerConditionId`=1702260588 AND `QuestgiverCreatureId`=1064593696 AND `locale`='enUS');
 INSERT INTO `quest_description_conditional` (`QuestId`, `PlayerConditionId`, `QuestgiverCreatureId`, `locale`, `Text`, `OrderIndex`, `VerifiedBuild`) VALUES
-(75538, 1702260588, 1064593696, 'enUS', 'es. Yes!\n\nAhem.\n\nShe requires your presence, she does! Our Lady of the Midnight Moon. The Damsel of Darkness! The Mother of Crows...\n\n...Madam Shadow.Travel to the Darkmoon Faire.', 0, 55939); -- Beginning Impositions
+(75538, 1702260588, 1064593696, 'enUS', 'es. Yes!\n\nAhem.\n\nShe requires your presence, she does! Our Lady of the Midnight Moon. The Damsel of Darkness! The Mother of Crows...\n\n...Madam Shadow.Travel to the Darkmoon Faire.', 0, 55664); -- Beginning Impositions
 
 DELETE FROM `creature_queststarter` WHERE (`id`=204198 AND `quest`=75538);
 INSERT INTO `creature_queststarter` (`id`, `quest`, `VerifiedBuild`) VALUES
-(204198, 75538, 55939); -- Beginning Impositions offered by Assistant Phineas 
+(204198, 75538, 55664); -- Beginning Impositions offered by Assistant Phineas
 
 DELETE FROM `quest_template_addon` WHERE `ID` = 75538;
 INSERT INTO `quest_template_addon` (`ID`, `MaxLevel`, `AllowableClasses`, `SourceSpellID`, `PrevQuestID`, `NextQuestID`, `ExclusiveGroup`, `BreadcrumbForQuestId`, `RewardMailTemplateID`, `RewardMailDelay`, `RequiredSkillID`, `RequiredSkillPoints`, `RequiredMinRepFaction`, `RequiredMaxRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepValue`, `ProvidedItemCount`, `SpecialFlags`, `ScriptName`) VALUES
