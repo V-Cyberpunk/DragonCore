@@ -6061,6 +6061,9 @@ void Spell::EffectChangeActiveCombatTraitConfig()
     if (!target)
         return;
 
+    if (target->IsLoading() && target->m_activePlayerData->TraitConfigs.empty())
+        return; // traits not loaded yet
+
     WorldPackets::Traits::TraitConfig* traitConfig = std::any_cast<WorldPackets::Traits::TraitConfig>(&m_customArg);
     if (!traitConfig)
         return;
