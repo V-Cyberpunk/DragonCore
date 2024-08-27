@@ -19,7 +19,7 @@ PrivateKeyFile = "./server.key"
 * update client portal. open <wow_dir>/\_retail\_/WTF/Config.wtf if not there, start wow first and close. change SET portal entry "SET portal "wow.df"
 * create a DNS A record, if you have DNS server or use the hosts file, on Windows it's at C:\Windows\System32\drivers\etc\hosts, to redirect the domain wow.df to your ip
 
-Thanks to motivewc with the cert inspiration. Had the patching month ago but didn't thought about the certs to import. But it's logacially. :D
+Thanks to motivewc with the cert inspiration. Had the patching month ago but didn't thought about the certs to import. But it's logically. :D
 
 <br>
 Below is the original TrinityCore Readme:
