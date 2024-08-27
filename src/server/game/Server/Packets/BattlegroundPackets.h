@@ -24,7 +24,6 @@
 #include "Optional.h"
 #include "PacketUtilities.h"
 #include "Position.h"
-#include "Map.h"
 #include <array>
 
 namespace WorldPackets
@@ -569,19 +568,6 @@ namespace WorldPackets
             WorldPacket const* Write() override;
 
             ObjectGuid CapturePointGUID;
-        };
-
-        class JoinSkirmish final : public ClientPacket
-        {
-        public:
-            JoinSkirmish(WorldPacket&& packet) : ClientPacket(CMSG_BATTLEMASTER_JOIN_SKIRMISH, std::move(packet)) { }
-
-            void Read() override;
-
-            uint8 Roles = 0;
-            BracketType Bracket;
-            bool JoinAsGroup = false;
-            bool UnkBool = false;
         };
     }
 }
