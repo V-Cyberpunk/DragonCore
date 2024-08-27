@@ -137,8 +137,10 @@ namespace Trinity
                 diff = 15;
             else if (pl_level < 60)
                 diff = 16;
-            else
+            else if (pl_level < 70)
                 diff = 17;
+            else
+                diff = 18;
 
             sScriptMgr->OnZeroDifferenceCalculation(diff, pl_level);
             return diff;
