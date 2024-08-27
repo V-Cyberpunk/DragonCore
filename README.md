@@ -4,6 +4,24 @@ DragonCore is a derivative of the last Dragonflight revision from TrinityCore an
 Target version is 10.2.7.<br>
 Data, Launcher and DB are in the Release section.<br><br>
 
+## connection_patcher how to:
+
+* Use: connection_patcher <path_to_wow_exe>/Wow.exe
+* Choose a domain name. e.g. wow.df, use your own domain name ;)
+* create a self signed cert for wow.df: "openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout server.key -out server.crt -subj "/CN=wow.df" -addext "subjectAltName=DNS:wow.df"
+* move these two files to your bin dir of your server
+* Double click the crt, Install Certificate -> Local Machine -> Place certificate in the following store: Trusted Root Certification Authorities
+* edit bnetserver.conf<br>
+LoginREST.ExternalAddress="wow.df"<br>
+CertificatesFile = "./server.crt"<br>
+PrivateKeyFile = "./server.key"
+* update your realmlist with mysql: UPDATE realmlist SET address = 'wow.df';
+* update client portal. open <wow_dir>/\_retail\_/WTF/Config.wtf if not there, start wow first and close. change SET portal entry "SET portal "wow.df"
+* create a DNS A record, if you have DNS server or use the hosts file, on Windows it's at C:\Windows\System32\drivers\etc\hosts, to redirect the domain wow.df to your ip
+
+Thanks to motivewc with the cert inspiration. Had the patching month ago but didn't thought about the certs to import. But it's logacially. :D
+
+<br>
 Below is the original TrinityCore Readme:
 
 --------------
@@ -34,7 +52,7 @@ master | 3.3.5 | wotlk_classic
 [![master Build Status](https://circleci.com/gh/TrinityCore/TrinityCore/tree/master.svg?style=shield)](https://circleci.com/gh/TrinityCore/TrinityCore/tree/master) | [![3.3.5 Build Status](https://circleci.com/gh/TrinityCore/TrinityCore/tree/3.3.5.svg?style=shield)](https://circleci.com/gh/TrinityCore/TrinityCore/tree/3.3.5) | [![wotlk_classic Build Status](https://circleci.com/gh/TrinityCore/TrinityCore/tree/wotlk_classic.svg?style=shield)](https://circleci.com/gh/TrinityCore/TrinityCore/tree/wotlk_classic)
 [![master Build status](https://ci.appveyor.com/api/projects/status/54d0u1fxe50ad80o/branch/master?svg=true)](https://ci.appveyor.com/project/DDuarte/trinitycore/branch/master) | [![Build status](https://ci.appveyor.com/api/projects/status/54d0u1fxe50ad80o/branch/3.3.5?svg=true)](https://ci.appveyor.com/project/DDuarte/trinitycore/branch/3.3.5) | [![Build status](https://ci.appveyor.com/api/projects/status/54d0u1fxe50ad80o/branch/wotlk_classic?svg=true)](https://ci.appveyor.com/project/DDuarte/trinitycore/branch/wotlk_classic)
 [![master GCC Build status](https://github.com/TrinityCore/TrinityCore/actions/workflows/gcc-build.yml/badge.svg?branch=master&event=push)](https://github.com/TrinityCore/TrinityCore/actions?query=workflow%3AGCC+branch%3Amaster+event%3Apush) | [![3.3.5 GCC Build status](https://github.com/TrinityCore/TrinityCore/actions/workflows/gcc-build.yml/badge.svg?branch=3.3.5&event=push)](https://github.com/TrinityCore/TrinityCore/actions?query=workflow%3AGCC+branch%3A3.3.5+event%3Apush) | [![wotlk_classic GCC Build status](https://github.com/TrinityCore/TrinityCore/actions/workflows/gcc-build.yml/badge.svg?branch=wotlk_classic&event=push)](https://github.com/TrinityCore/TrinityCore/actions?query=workflow%3AGCC+branch%3Awotlk_classic+event%3Apush)
-[![master macOS arm64 Build status](https://github.com/TrinityCore/TrinityCore/actions/workflows/macos-arm-build.yml/badge.svg?branch=master&event=push)](https://github.com/TrinityCore/TrinityCore/actions?query=workflow%3AGCC+branch%3Amaster+event%3Apush) | | 
+[![master macOS arm64 Build status](https://github.com/TrinityCore/TrinityCore/actions/workflows/macos-arm-build.yml/badge.svg?branch=master&event=push)](https://github.com/TrinityCore/TrinityCore/actions?query=workflow%3AGCC+branch%3Amaster+event%3Apush) | |
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/435/badge.svg)](https://scan.coverity.com/projects/435) | [![Coverity Scan Build Status](https://scan.coverity.com/projects/4656/badge.svg)](https://scan.coverity.com/projects/4656) |
 
 ## Introduction
