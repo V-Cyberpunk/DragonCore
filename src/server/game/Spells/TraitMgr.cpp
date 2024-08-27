@@ -493,23 +493,21 @@ std::vector<UF::TraitEntry> GetGrantedTraitEntriesForConfig(WorldPackets::Traits
     if (!trees)
         return entries;
 
-    auto addGrantedRankToEntry = [&entries](int32 nodeId, NodeEntry const& entry, int32 grantedRanks)
+    auto getOrCreateEntry = [&entries](int32 nodeId, int32 entryId)
     {
         auto itr = std::ranges::find_if(entries, [&](UF::TraitEntry const& traitEntry)
         {
-            return traitEntry.TraitNodeID == nodeId && traitEntry.TraitNodeEntryID == int32(entry.Data->ID);
+            return traitEntry.TraitNodeID == nodeId && traitEntry.TraitNodeEntryID == entryId;
         });
         if (itr == entries.end())
         {
             itr = entries.emplace(entries.end());
             itr->TraitNodeID = nodeId;
-            itr->TraitNodeEntryID = int32(entry.Data->ID);
+            itr->TraitNodeEntryID = entryId;
             itr->Rank = 0;
             itr->GrantedRanks = 0;
         }
-        itr->GrantedRanks += grantedRanks;
-        if (itr->GrantedRanks > entry.Data->MaxRanks)
-            itr->GrantedRanks = entry.Data->MaxRanks;
+        return &*itr;
     };
 
     Optional<std::map<int32, int32>> cachedCurrencies;
@@ -521,18 +519,18 @@ std::vector<UF::TraitEntry> GetGrantedTraitEntriesForConfig(WorldPackets::Traits
             for (NodeEntry const& entry : node->Entries)
                 for (TraitCondEntry const* condition : entry.Conditions)
                     if (condition->GetCondType() == TraitConditionType::Granted && MeetsTraitCondition(traitConfig, player, condition, cachedCurrencies))
-                        addGrantedRankToEntry(node->Data->ID, entry, condition->GrantedRanks);
+                        getOrCreateEntry(node->Data->ID, entry.Data->ID)->GrantedRanks += condition->GrantedRanks;
 
             for (TraitCondEntry const* condition : node->Conditions)
                 if (condition->GetCondType() == TraitConditionType::Granted && MeetsTraitCondition(traitConfig, player, condition, cachedCurrencies))
                     for (NodeEntry const& entry : node->Entries)
-                        addGrantedRankToEntry(node->Data->ID, entry, condition->GrantedRanks);
+                        getOrCreateEntry(node->Data->ID, entry.Data->ID)->GrantedRanks += condition->GrantedRanks;
 
             for (NodeGroup const* group : node->Groups)
                 for (TraitCondEntry const* condition : group->Conditions)
                     if (condition->GetCondType() == TraitConditionType::Granted && MeetsTraitCondition(traitConfig, player, condition, cachedCurrencies))
                         for (NodeEntry const& entry : node->Entries)
-                            addGrantedRankToEntry(node->Data->ID, entry, condition->GrantedRanks);
+                            getOrCreateEntry(node->Data->ID, entry.Data->ID)->GrantedRanks += condition->GrantedRanks;
         }
     }
 
@@ -555,7 +553,7 @@ bool IsValidEntry(WorldPackets::Traits::TraitEntry const& traitEntry)
     return true;
 }
 
-LearnResult ValidateConfig(WorldPackets::Traits::TraitConfig& traitConfig, PlayerDataAccessor player, bool requireSpendingAllCurrencies /*= false*/, bool removeInvalidEntries /*= false*/)
+LearnResult ValidateConfig(WorldPackets::Traits::TraitConfig const& traitConfig, PlayerDataAccessor player, bool requireSpendingAllCurrencies /*= false*/)
 {
     auto getNodeEntryCount = [&](int32 traitNodeId)
     {
@@ -605,13 +603,13 @@ LearnResult ValidateConfig(WorldPackets::Traits::TraitConfig& traitConfig, Playe
         return !hasConditions;
     };
 
-    auto isValidTraitEntry = [&](WorldPackets::Traits::TraitEntry const& traitEntry)
+    for (WorldPackets::Traits::TraitEntry const& traitEntry : traitConfig.Entries)
     {
         if (!IsValidEntry(traitEntry))
             return LearnResult::Unknown;
 
         Node const* node = Trinity::Containers::MapGetValuePtr(_traitNodes, traitEntry.TraitNodeID);
-        if (node->Data->GetType() == TraitNodeType::Selection || node->Data->GetType() == TraitNodeType::SubTreeSelection)
+        if (node->Data->GetType() == TraitNodeType::Selection)
             if (getNodeEntryCount(traitEntry.TraitNodeID) != 1)
                 return LearnResult::Unknown;
 
@@ -645,29 +643,6 @@ LearnResult ValidateConfig(WorldPackets::Traits::TraitConfig& traitConfig, Playe
             if (!hasAnyParentTrait)
                 return LearnResult::NotEnoughTalentsInPrimaryTree;
         }
-
-        return LearnResult::Ok;
-    };
-
-    for (auto itr = traitConfig.Entries.begin(); itr != traitConfig.Entries.end(); )
-    {
-        LearnResult result = isValidTraitEntry(*itr);
-        if (result != LearnResult::Ok)
-        {
-            if (!removeInvalidEntries)
-                return result;
-
-            if (!itr->GrantedRanks  // fully remove entries that don't have granted ranks
-                || !itr->Rank)      // ... or entries that do have them and don't have any additional spent ranks (can happen if the same entry is revalidated after first removing all spent ranks)
-                traitConfig.Entries.erase(itr);
-            else
-                itr->Rank = 0;
-
-            // revalidate entire config - a removed entry will invalidate all other entries that depend on it
-            itr = traitConfig.Entries.begin();
-        }
-        else
-            ++itr;
     }
 
     std::map<int32, int32> grantedCurrencies;
