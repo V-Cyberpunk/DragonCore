@@ -34,7 +34,7 @@ Thanks to motivewc with the cert inspiration. Had the patching month ago but did
 More documentation here: https://trinitycore.info/
 <br><br>
 
-## RetailCoreDB Features from the ReatailCoreDB Readme
+## RetailCoreDB Features from the RetailCoreDB Readme
 <br>
 Contentprogress:
 <br><br>
