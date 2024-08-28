@@ -1,0 +1,1 @@
+LoginREST in bnetserver auch anpassen an externe netzwerk ip
