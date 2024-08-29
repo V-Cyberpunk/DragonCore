@@ -2187,6 +2187,9 @@ class TC_GAME_API Player final : public Unit, public GridObject<Player>
 
         void RemovedInsignia(Player* looterPlr);
 
+        void InitAdvancedFly();
+        void AddMoveImpulse(Position direction);
+
         WorldSession* GetSession() const { return m_session; }
 
     protected:

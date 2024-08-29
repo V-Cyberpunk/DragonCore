@@ -288,7 +288,7 @@ bool LootStoreItem::IsValid(LootStore const& store, uint32 entry) const
             return false;
         }
 
-        if (chance != 0 && chance < 0.000001f)             // loot with low chance
+        if (chance != 0 && chance < 0.0001f)             // loot with low chance
         {
             TC_LOG_ERROR("sql.sql", "Table '{}' Entry {} Item {}: low chance ({}) - skipped",
                 store.GetName(), entry, itemid, chance);
