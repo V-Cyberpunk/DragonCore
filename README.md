@@ -7,6 +7,7 @@ Data, Launcher and DB are in the Release section.<br><br>
 ## DragonCore Features
 
 * supports Dragonflight 10.2.7.55664
+* dragonriding
 * offline extractor tools
 * connection_patcher
 * map questmarker
