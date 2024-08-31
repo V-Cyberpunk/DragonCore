@@ -8219,11 +8219,12 @@ void Unit::UpdateMountCapability()
         if (!aurEff->GetAmount())
             aurEff->GetBase()->Remove();
         else if (MountCapabilityEntry const* capability = sMountCapabilityStore.LookupEntry(aurEff->GetAmount())) // aura may get removed by interrupt flag, reapply
-            {
-                SetFlightCapabilityID(capability->FlightCapabilityID);
-                if (!HasAura(capability->ModSpellAuraID))
-                    CastSpell(this, capability->ModSpellAuraID, aurEff);
-            }
+        {
+            SetFlightCapabilityID(capability->FlightCapabilityID);
+
+            if (!HasAura(capability->ModSpellAuraID))
+                CastSpell(this, capability->ModSpellAuraID, aurEff);
+        }
     }
 }
 
@@ -12480,7 +12481,7 @@ bool Unit::CanSwim() const
 
 float Unit::GetAdvFlyingVelocity() const
 {
-    auto advFlying = m_movementInfo.advFlying;
+    Optional<MovementInfo::AdvFlying> const& advFlying = m_movementInfo.advFlying;
     if (!advFlying)
         return .0f;
 

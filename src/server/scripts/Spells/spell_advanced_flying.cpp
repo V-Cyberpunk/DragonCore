@@ -32,16 +32,51 @@
 #include <MovementPackets.h>
 #include <G3D/g3dmath.h>
 
-enum DragonRidingSpells
+enum AdvancedFlyingSpells
 {
     SPELL_DRAGONRIDER_ENERGIZE  = 372606,
     SPELL_VIGOR_CACHE           = 433547,
     SPELL_RIDING_ABROAD         = 432503, // TODO outside of dragon isles
+    SPELL_ENERGY_WIDGET         = 423624,
+};
+
+// 373646 - Soar (Racial)
+// 406095 - Skyriding
+// 430833 - Soar (Racial)
+class spell_af_skyriding : public AuraScript
+{
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), SPELL_ENERGY_WIDGET, true);
+        GetTarget()->SetPower(POWER_ALTERNATE_MOUNT, GetTarget()->GetPower(POWER_ALTERNATE_MOUNT), true);
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ENERGY_WIDGET);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_af_skyriding::OnApply, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_af_skyriding::OnRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+    }
 };
 
 // 372773 - Dragonrider Energy
 class spell_af_energy : public AuraScript
 {
+    void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (!target->HasAura(SPELL_VIGOR_CACHE))
+        {
+            CastSpellExtraArgs extraArgs(TRIGGERED_FULL_MASK);
+            extraArgs.AddSpellMod(SPELLVALUE_BASE_POINT0, target->GetPower(POWER_ALTERNATE_MOUNT));
+            target->CastSpell(target, SPELL_VIGOR_CACHE, extraArgs);
+        }
+    }
+
     void OnPeriodic(AuraEffect* /*aurEff*/)
     {
         if (Unit* caster = GetCaster())
@@ -71,6 +106,19 @@ class spell_af_energy : public AuraScript
         }
     }
 
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_VIGOR_CACHE);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_af_energy::OnApply, EFFECT_0, SPELL_AURA_ENABLE_ALT_POWER, AURA_EFFECT_HANDLE_REAL);
+        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_af_energy::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
+        OnEffectRemove += AuraEffectRemoveFn(spell_af_energy::OnRemove, EFFECT_0, SPELL_AURA_ENABLE_ALT_POWER, AURA_EFFECT_HANDLE_REAL);
+    }
+
+private:
     bool ShouldRegenEnergy(Unit const* caster) const
     {
         if (caster->GetPower(POWER_ALTERNATE_MOUNT) == caster->GetMaxPower(POWER_ALTERNATE_MOUNT))
@@ -85,11 +133,6 @@ class spell_af_energy : public AuraScript
             return true;
 
         return !caster->IsInAir() || caster->IsInWater();
-    }
-
-    void Register() override
-    {
-        OnEffectUpdatePeriodic += AuraEffectUpdatePeriodicFn(spell_af_energy::OnPeriodic, EFFECT_1, SPELL_AURA_PERIODIC_DUMMY);
     }
 };
 
@@ -160,6 +203,7 @@ class spell_af_whirling_surge : public SpellScript
 
 void AddSC_advanced_flying_spell_scripts()
 {
+    RegisterSpellScript(spell_af_skyriding);
     RegisterSpellScript(spell_af_energy);
     RegisterSpellScript(spell_af_skyward_ascent);
     RegisterSpellScript(spell_af_surge_forward);
