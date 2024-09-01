@@ -889,7 +889,7 @@ class spell_dru_flourish : public SpellScript
         Unit* caster = GetCaster();
         Unit* target = GetHitUnit();
 
-        std::list<AuraEffect*> effectList = target->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
+        Unit::AuraEffectList effectList = target->GetAuraEffectsByType(SPELL_AURA_PERIODIC_HEAL);
 
         for (AuraEffect* aurEff : effectList)
         {
