@@ -21,13 +21,15 @@
  * Scriptnames of files in this file should be prefixed with "spell_dru_".
  */
 
-#include "ScriptMgr.h"
+#include "AreaTrigger.h"
 #include "CellImpl.h"
 #include "Containers.h"
 #include "DB2Stores.h"
+#include "ObjectAccessor.h"
 #include "GridNotifiersImpl.h"
 #include "ObjectAccessor.h"
 #include "Player.h"
+#include "ScriptMgr.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
@@ -67,6 +69,7 @@ enum DruidSpells
     SPELL_DRUID_ECLIPSE_SOLAR_SPELL_CNT        = 326053,
     SPELL_DRUID_ECLIPSE_VISUAL_LUNAR           = 93431,
     SPELL_DRUID_ECLIPSE_VISUAL_SOLAR           = 93430,
+    SPELL_DRUID_EFFLORESCENCE                  = 145205,
     SPELL_DRUID_EFFLORESCENCE_AURA             = 81262,
     SPELL_DRUID_EFFLORESCENCE_HEAL             = 81269,
     SPELL_DRUID_EMBRACE_OF_THE_DREAM_EFFECT    = 392146,
@@ -102,11 +105,15 @@ enum DruidSpells
     SPELL_DRUID_INNERVATE_RANK_2               = 326228,
     SPELL_DRUID_INFUSION                       = 37238,
     SPELL_DRUID_LANGUISH                       = 71023,
+    SPELL_DRUID_LIFEBLOOM                      = 33763,
+    SPELL_DRUID_LIFEBLOOM_OVERGROWTH           = 188550,
     SPELL_DRUID_LIFEBLOOM_FINAL_HEAL           = 33778,
     SPELL_DRUID_LUNAR_INSPIRATION_OVERRIDE     = 155627,
     SPELL_DRUID_MANGLE                         = 33917,
     SPELL_DRUID_MASS_ENTANGLEMENT              = 102359,
     SPELL_DRUID_MOONFIRE_DAMAGE                = 164812,
+    SPELL_DRUID_PHOTOSYNTHESIS                 = 274902,
+    SPELL_DRUID_PHOTOSYNTHESIS_EFFECT          = 274906,
     SPELL_DRUID_NEW_MOON                       = 274281,
     SPELL_DRUID_NEW_MOON_OVERRIDE              = 274295,
     SPELL_DRUID_POWER_OF_THE_ARCHDRUID         = 392302,
@@ -131,6 +138,8 @@ enum DruidSpells
     SPELL_DRUID_THRASH_BEAR                    = 77758,
     SPELL_DRUID_THRASH_BEAR_AURA               = 192090,
     SPELL_DRUID_THRASH_CAT                     = 106830,
+    SPELL_DRUID_VERDANCY                       = 392325,
+    SPELL_DRUID_VERDANCY_HEAL                  = 392329,
     SPELL_DRUID_YSERAS_GIFT_HEAL_PARTY         = 145110,
     SPELL_DRUID_YSERAS_GIFT_HEAL_SELF          = 145109
 };
@@ -1271,23 +1280,146 @@ class spell_dru_item_t6_trinket : public AuraScript
 };
 
 // 33763 - Lifebloom
+// 188550 - Lifebloom (Undergrowth)
 class spell_dru_lifebloom : public AuraScript
 {
-    bool Validate(SpellInfo const* /*spell*/) override
+    bool Validate(SpellInfo const* /*spellInfo*/) override
     {
         return ValidateSpellInfo({ SPELL_DRUID_LIFEBLOOM_FINAL_HEAL });
     }
 
-    void AfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    void HandleAfterRemove(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
     {
-        // Final heal only on duration end
+        Unit* caster = GetCaster();
+        Unit* target = GetTarget();
+        if (!caster)
+            return;
+
         if (GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_EXPIRE || GetTargetApplication()->GetRemoveMode() == AURA_REMOVE_BY_ENEMY_SPELL)
-            GetCaster()->CastSpell(GetUnitOwner(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, true);
+            caster->CastSpell(target, SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, CastSpellExtraArgs(aurEff));
     }
 
     void Register() override
     {
-        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_lifebloom::AfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_dru_lifebloom::HandleAfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
+// 33778 - Lifebloom (Heal)
+class spell_dru_lifebloom_heal : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_EFFLORESCENCE })
+            && ValidateSpellEffect({ { SPELL_DRUID_VERDANCY, EFFECT_0 } });
+    }
+
+    void HandleOnHit(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+
+        // Note: Verdancy talent.
+        if (AuraEffect const* verdancyEffect = caster->GetAuraEffect(SPELL_DRUID_VERDANCY, EFFECT_0))
+        {
+            AreaTrigger const* efflorescenceAT = caster->GetAreaTrigger(SPELL_DRUID_EFFLORESCENCE);
+            if (!efflorescenceAT)
+                return;
+
+            std::list<Unit*> targetList;
+
+            for (ObjectGuid const& guid : efflorescenceAT->GetInsideUnits())
+            {
+                if (Unit* unit = ObjectAccessor::GetUnit(*caster, guid))
+                {
+                    if (!caster->IsValidAssistTarget(unit))
+                        continue;
+
+                    targetList.push_back(unit);
+                }
+            }
+
+            // Note: max. targets is Verdancy's EFFECT_0.
+            uint32 const maxTargets = verdancyEffect->GetAmount();
+
+            if (targetList.size() > maxTargets)
+                 Trinity::Containers::RandomResize(targetList, maxTargets);
+
+            for (Unit* target : targetList)
+                caster->CastSpell(target, SPELL_DRUID_VERDANCY_HEAL, TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_CAST_IN_PROGRESS);
+        }
+    }
+
+    void Register() override
+    {
+         OnEffectHitTarget += SpellEffectFn(spell_dru_lifebloom_heal::HandleOnHit, EFFECT_0, SPELL_EFFECT_HEAL);
+    }
+};
+
+// 274902 - Photosynthesis
+class spell_dru_photosynthesis : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo
+        ({
+            SPELL_DRUID_LIFEBLOOM,
+            SPELL_DRUID_LIFEBLOOM_FINAL_HEAL,
+            SPELL_DRUID_LIFEBLOOM_OVERGROWTH
+        });
+    }
+
+    bool CheckProc(AuraEffect const* aurEff, ProcEventInfo& eventInfo)
+    {
+        return roll_chance_i(aurEff->GetAmount()) &&
+            (eventInfo.GetActionTarget()->HasAura(SPELL_DRUID_LIFEBLOOM, eventInfo.GetActor()->GetGUID()) ||
+             eventInfo.GetActionTarget()->HasAura(SPELL_DRUID_LIFEBLOOM_OVERGROWTH, eventInfo.GetActor()->GetGUID()));
+    }
+
+    void HandleProc(AuraEffect* aurEff, ProcEventInfo& eventInfo)
+    {
+        GetTarget()->CastSpell(eventInfo.GetActionTarget(), SPELL_DRUID_LIFEBLOOM_FINAL_HEAL, CastSpellExtraArgs(aurEff));
+    }
+
+    void Register() override
+    {
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_dru_photosynthesis::CheckProc, EFFECT_1, SPELL_AURA_DUMMY);
+        OnEffectProc += AuraEffectProcFn(spell_dru_photosynthesis::HandleProc, EFFECT_1, SPELL_AURA_DUMMY);
+    }
+};
+
+// 274906 - Photosynthesis
+// Called by Lifebloom and Lifebloom (Overgrowth)
+class spell_dru_photosynthesis_effect : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DRUID_PHOTOSYNTHESIS_EFFECT })
+                    && ValidateSpellEffect({ { SPELL_DRUID_PHOTOSYNTHESIS, EFFECT_0 } });
+    }
+
+    void HandleOnApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (target->GetGUID() != GetCasterGUID())
+            return;
+
+        if (AuraEffect const* photosynthesisEffect = target->GetAuraEffect(SPELL_DRUID_PHOTOSYNTHESIS, EFFECT_0))
+            target->CastSpell(target, SPELL_DRUID_PHOTOSYNTHESIS_EFFECT, CastSpellExtraArgs(aurEff).AddSpellBP0(photosynthesisEffect->GetAmount()));
+    }
+
+    void HandleAfterRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+        if (target->GetGUID() != GetCasterGUID())
+            return;
+
+        target->RemoveAurasDueToSpell(SPELL_DRUID_PHOTOSYNTHESIS_EFFECT);
+    }
+
+    void Register() override
+    {
+        OnEffectApply += AuraEffectApplyFn(spell_dru_photosynthesis_effect::HandleOnApply, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
+                AfterEffectRemove += AuraEffectRemoveFn(spell_dru_photosynthesis_effect::HandleAfterRemove, EFFECT_0, SPELL_AURA_PERIODIC_HEAL, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -2331,6 +2463,7 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScript(spell_dru_innervate);
     RegisterSpellScript(spell_dru_item_t6_trinket);
     RegisterSpellScript(spell_dru_lifebloom);
+    RegisterSpellScript(spell_dru_lifebloom_heal);
     RegisterSpellScript(spell_dru_lunar_inspiration);
     RegisterSpellScript(spell_dru_luxuriant_soil);
     RegisterSpellScript(spell_dru_moonfire);
@@ -2339,6 +2472,8 @@ void AddSC_druid_spell_scripts()
     RegisterSpellScriptWithArgs(spell_dru_new_moon, "spell_dru_new_moon", Optional<DruidSpells>(SPELL_DRUID_NEW_MOON_OVERRIDE), Optional<DruidSpells>());
     RegisterSpellScript(spell_dru_omen_of_clarity);
     RegisterSpellScript(spell_dru_omen_of_clarity_restoration);
+    RegisterSpellScript(spell_dru_photosynthesis);
+    RegisterSpellScript(spell_dru_photosynthesis_effect);
     RegisterSpellScript(spell_dru_power_of_the_archdruid);
     RegisterSpellScript(spell_dru_prowl);
     RegisterSpellScript(spell_dru_rip);
