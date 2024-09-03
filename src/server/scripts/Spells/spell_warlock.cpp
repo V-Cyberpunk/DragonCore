@@ -258,30 +258,36 @@ class spell_warl_chaotic_energies : public AuraScript
     }
 };
 
-// Called by 146739 - Corruption
-class spell_warl_absolute_corruption : public AuraScript
+// 146739 - Corruption
+// 445474 - Wither
+class spell_warl_absolute_corruption : public SpellScript
 {
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_WARLOCK_ABSOLUTE_CORRUPTION });
+        return ValidateSpellEffect({ { SPELL_WARLOCK_ABSOLUTE_CORRUPTION, EFFECT_0 } });
     }
 
-    void HandleApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    bool Load() override
     {
-        if (GetCaster()->HasAura(SPELL_WARLOCK_ABSOLUTE_CORRUPTION))
-        {
-            Milliseconds duration = 0ms;
-            duration = Seconds(sSpellMgr->GetSpellInfo(SPELL_WARLOCK_ABSOLUTE_CORRUPTION, GetCastDifficulty())->GetEffect(EFFECT_0).CalcValue());
+        return GetCaster()->HasAura(SPELL_WARLOCK_ABSOLUTE_CORRUPTION);
+    }
 
-            Unit* target = GetTarget();
-            GetAura()->SetMaxDuration(target->GetTypeId() == TYPEID_PLAYER ? duration.count() : -1);
-            GetAura()->SetDuration(target->GetTypeId() == TYPEID_PLAYER ? duration.count() : -1);
+    void HandleApply(SpellEffIndex /*effIndex*/) const
+    {
+        if (Aura const* absoluteCorruption = GetCaster()->GetAura(SPELL_WARLOCK_ABSOLUTE_CORRUPTION))
+        {
+            Milliseconds duration = GetHitUnit()->IsPvP()
+                ? Seconds(absoluteCorruption->GetSpellInfo()->GetEffect(EFFECT_0).CalcValue())
+                : Milliseconds(-1);
+
+            GetHitAura()->SetMaxDuration(duration.count());
+            GetHitAura()->SetDuration(duration.count());
         }
     }
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_warl_absolute_corruption::HandleApply, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE, AURA_EFFECT_HANDLE_REAL_OR_REAPPLY_MASK);
+        OnEffectHitTarget += SpellEffectFn(spell_warl_absolute_corruption::HandleApply, EFFECT_0, SPELL_EFFECT_APPLY_AURA);
     }
 };
 
