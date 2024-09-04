@@ -21,7 +21,7 @@ Data, Launcher and DB are in the Release section.<br><br>
 * Choose a domain name. e.g. wow.df, use your own domain name ;)
 * create a self signed cert for wow.df: execute cert_creator and enter your domain name. Both files will be created and are already in the correct dir if you execute from your bin dir. Valid for 10 years.
 * move these two files to your bin dir of your server if the files are NOT already in your bin dir
-* Double click the crt, Install Certificate -> Local Machine -> Place certificate in the following store: Trusted Root Certification Authorities
+* on Windows, double click the crt, Install Certificate -> Local Machine -> Place certificate in the following store: Trusted Root Certification Authorities
 * edit bnetserver.conf<br>
 LoginREST.ExternalAddress="wow.df"
 * update your realmlist with mysql: UPDATE realmlist SET address = 'wow.df';
