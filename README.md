@@ -10,21 +10,20 @@ Data, Launcher and DB are in the Release section.<br><br>
 * dragonriding
 * offline extractor tools
 * connection_patcher
+* cert_creator
 * map questmarker
 * reagent bag and bag sorting
 
-## connection_patcher How To
+## connection_patcher / cert_creator How To
 
 * no Arctium Launcher needed
 * Use: connection_patcher <path_to_wow_exe>/Wow.exe
 * Choose a domain name. e.g. wow.df, use your own domain name ;)
-* create a self signed cert for wow.df: "openssl req -x509 -newkey rsa:4096 -sha256 -days 3650 -nodes -keyout server.key -out server.crt -subj "/CN=wow.df" -addext "subjectAltName=DNS:wow.df" "
-* move these two files to your bin dir of your server
+* create a self signed cert for wow.df: execute cert_creator and enter your domain name. Both files will be created and are already in the correct dir if you execute from your bin dir. Valid for 10 years.
+* move these two files to your bin dir of your server if the files are NOT already in your bin dir
 * Double click the crt, Install Certificate -> Local Machine -> Place certificate in the following store: Trusted Root Certification Authorities
 * edit bnetserver.conf<br>
-LoginREST.ExternalAddress="wow.df"<br>
-CertificatesFile = "./server.crt"<br>
-PrivateKeyFile = "./server.key"
+LoginREST.ExternalAddress="wow.df"
 * update your realmlist with mysql: UPDATE realmlist SET address = 'wow.df';
 * update client portal. open <wow_dir>/\_retail\_/WTF/Config.wtf if not there, start wow first and close. change SET portal entry "SET portal "wow.df"
 * create a DNS A record, if you have DNS server or use the hosts file, on Windows it's at C:\Windows\System32\drivers\etc\hosts, to redirect the domain wow.df to your ip

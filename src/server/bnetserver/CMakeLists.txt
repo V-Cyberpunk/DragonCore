@@ -64,12 +64,6 @@ set_target_properties(bnetserver
       FOLDER
         "server")
 
-add_custom_command(TARGET bnetserver
-  POST_BUILD
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.cert.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bnetserver.cert.pem
-  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_CURRENT_SOURCE_DIR}/bnetserver.key.pem ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/bnetserver.key.pem
-)
-
 if (UNIX)
   install(TARGETS bnetserver DESTINATION bin)
   if (COPY_CONF)
@@ -79,7 +73,6 @@ if (UNIX)
     )
     install(FILES bnetserver.conf.dist DESTINATION ${CONF_DIR})
   endif()
-  install(FILES bnetserver.cert.pem bnetserver.key.pem DESTINATION bin)
 elseif (WIN32)
   install(TARGETS bnetserver DESTINATION "${CMAKE_INSTALL_PREFIX}")
   if (COPY_CONF)
@@ -89,7 +82,6 @@ elseif (WIN32)
     )
     install(FILES bnetserver.conf.dist DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
-  install(FILES bnetserver.cert.pem bnetserver.key.pem DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()
 
 # Generate precompiled header
