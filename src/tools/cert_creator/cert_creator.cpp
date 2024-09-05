@@ -45,26 +45,52 @@
 #include <openssl/x509v3.h>
 #include <openssl/x509.h>
 #include <openssl/pem.h>
+#include <openssl/err.h>
 
 std::string domain;
 
 /* Generates a 4096-bit RSA key. */
 EVP_PKEY* generate_key()
 {
-  /* EVP_PKEY structure is for storing an algorithm-independent private key in memory. */
-  EVP_PKEY* pkey = EVP_PKEY_new();
+    EVP_PKEY_CTX* ctx = nullptr;
+    EVP_PKEY* pkey = nullptr;
 
-  /* Generate a RSA key and assign it to pkey.
-   * RSA_generate_key is deprecated.
-   */
-  BIGNUM* bne = BN_new();
-  BN_set_word(bne, RSA_F4);
-  RSA* rsa = RSA_new();
-  RSA_generate_key_ex(rsa, 4096, bne, nullptr);
+    // Create the context for key generation
+    ctx = EVP_PKEY_CTX_new_id(EVP_PKEY_RSA, nullptr);
+    if (!ctx)
+    {
+        ERR_print_errors_fp(stderr);
+        return nullptr;
+    }
 
-  EVP_PKEY_assign_RSA(pkey, rsa);
+    // Initialize the key generation
+    if (EVP_PKEY_keygen_init(ctx) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+        EVP_PKEY_CTX_free(ctx);
+        return nullptr;
+    }
 
-  return pkey;
+    // Set the RSA key length to 4096 bits
+    if (EVP_PKEY_CTX_set_rsa_keygen_bits(ctx, 4096) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+        EVP_PKEY_CTX_free(ctx);
+        return nullptr;
+    }
+
+    // Generate the key
+    if (EVP_PKEY_keygen(ctx, &pkey) <= 0)
+    {
+        ERR_print_errors_fp(stderr);
+        EVP_PKEY_CTX_free(ctx);
+        return nullptr;
+    }
+
+    // Free the context after use
+    EVP_PKEY_CTX_free(ctx);
+
+    return pkey;
 }
 
 void add_subject_alt_name(X509* cert, const char* dns_name)
@@ -184,7 +210,7 @@ bool write_to_disk(EVP_PKEY * pkey, X509 * x509)
     return true;
 }
 
-int main(int argc, char ** argv)
+int main(/*int argc, char ** argv*/)
 {
     Trinity::Banner::Show("cert_creator", [](char const* text) { std::cout << text << std::endl; }, nullptr);
 
