@@ -99,14 +99,19 @@ class spell_warl_vile_taint : public SpellScript
         return ValidateSpellInfo({ SPELL_WARLOCK_AGONY, SPELL_WARLOCK_CURSE_OF_EXHAUSTION, SPELL_WARLOCK_VILE_TAINT_DAMAGE });
     }
 
-    void HandleScriptEffect(SpellEffIndex /*effIndex*/)
+    void HandleScriptEffect(SpellEffIndex /*effIndex*/) const
     {
         Unit* caster = GetCaster();
-        Unit* target = GetHitUnit();
+        CastSpellTargetArg target = GetHitUnit();
 
-        caster->CastSpell(target, SPELL_WARLOCK_AGONY, true);
-        caster->CastSpell(target, SPELL_WARLOCK_CURSE_OF_EXHAUSTION, true);
-        caster->CastSpell(target, SPELL_WARLOCK_VILE_TAINT_DAMAGE, true);
+        CastSpellExtraArgs args;
+        args.SetTriggerFlags(TRIGGERED_IGNORE_GCD | TRIGGERED_IGNORE_POWER_AND_REAGENT_COST
+            | TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR);
+        args.SetTriggeringSpell(GetSpell());
+
+        caster->CastSpell(target, SPELL_WARLOCK_AGONY, args);
+        caster->CastSpell(target, SPELL_WARLOCK_CURSE_OF_EXHAUSTION, args);
+        caster->CastSpell(target, SPELL_WARLOCK_VILE_TAINT_DAMAGE, args);
     }
 
     void Register() override
