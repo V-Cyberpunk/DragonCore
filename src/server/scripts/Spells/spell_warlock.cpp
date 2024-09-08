@@ -393,60 +393,9 @@ class spell_warl_dark_pact : public AuraScript
     }
 };
 
-// Called by 324540 - Malefic Rapture
-class spell_warl_deaths_embrace : public SpellScript
-{
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo ({ SPELL_WARLOCK_DEATHS_EMBRACE });
-    }
 
-    void HandleDamageCalculation(Unit const* victim, int32 const& /*damage*/, int32 const& /*flatMod*/, float& pctMod) const
-    {
-        if (AuraEffect const* deathsEmbraceDamagePct = GetCaster()->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_3))
-        {
-            if (victim->HealthBelowPct(deathsEmbraceDamagePct->GetAmount()))
-            {
-                AuraEffect const* deathsEmbraceDamageBonus = GetCaster()->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_2);
-                AddPct(pctMod, deathsEmbraceDamageBonus->GetAmount());
-            }
-        }
-    }
 
-    void Register() override
-    {
-        CalcDamage += SpellCalcDamageFn(spell_warl_deaths_embrace::HandleDamageCalculation);
-    }
-};
 
-// Called by 980 - Agony, 146739 - Corruption and 316099 - Unstable Affliction
-class spell_warl_deaths_embrace_aura : public AuraScript
-{
-    bool Validate(SpellInfo const* /*spellInfo*/) override
-    {
-        return ValidateSpellInfo ({ SPELL_WARLOCK_DEATHS_EMBRACE });
-    }
-
-    void CalculateDamage(AuraEffect const* /*aurEff*/, Unit* victim, int32& /*damage*/, int32& /*flatMod*/, float& pctMod) const
-    {
-        if (Unit* caster = GetCaster())
-        {
-            if (AuraEffect const* deathsEmbraceDamagePct = caster->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_3))
-            {
-                if (victim->HealthBelowPct(deathsEmbraceDamagePct->GetAmount()))
-                {
-                    AuraEffect const* deathsEmbraceDamageBonus = caster->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_2);
-                    AddPct(pctMod, deathsEmbraceDamageBonus->GetAmount());
-                }
-            }
-        }
-    }
-
-    void Register() override
-    {
-        DoEffectCalcDamageAndHealing += AuraEffectCalcDamageFn(spell_warl_deaths_embrace_aura::CalculateDamage, EFFECT_ALL, SPELL_AURA_PERIODIC_DAMAGE);
-    }
-};
 
 // 48018 - Demonic Circle: Summon
 class spell_warl_demonic_circle_summon : public AuraScript
@@ -558,32 +507,83 @@ class spell_warl_doom : public AuraScript
     }
 };
 
-// 234153 - Drain Life
-class spell_warl_drain_life : public AuraScript
+struct spell_warl_deaths_embrace_impl
+{
+    static void HandleDamageOrHealingCalculation(Unit const* caster, Unit const* target, float& pctMod, SpellEffIndex inreaseEffect, SpellEffIndex healthLimitEffect)
+    {
+        Aura const* deathsEmbrace = caster->GetAura(SPELL_WARLOCK_DEATHS_EMBRACE, ObjectGuid::Empty, ObjectGuid::Empty, 1 << inreaseEffect | 1 << healthLimitEffect);
+        if (!deathsEmbrace)
+            return;
+
+        if (!target->HealthBelowPct(deathsEmbrace->GetEffect(healthLimitEffect)->GetAmount()))
+            return;
+
+        AddPct(pctMod, deathsEmbrace->GetEffect(inreaseEffect)->GetAmount());
+    }
+};
+
+// Called by 324540 - Malefic Rapture
+class spell_warl_deaths_embrace : public SpellScript
 {
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo ({ SPELL_WARLOCK_DEATHS_EMBRACE });
+        return ValidateSpellEffect({ { SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_3 } });
     }
 
-    void CalculateHeal(AuraEffect const* /*aurEff*/, Unit* /*victim*/, int32& /*damage*/, int32& /*flatMod*/, float& pctMod) const
+    void HandleDamageCalculation(Unit const* victim, int32 const& /*damage*/, int32 const& /*flatMod*/, float& pctMod) const
     {
-        if (Unit* caster = GetCaster())
-        {
-            if (AuraEffect const* deathsEmbraceHealthPct = caster->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_1))
-            {
-                if (caster->HealthBelowPct(deathsEmbraceHealthPct->GetAmount()))
-                {
-                    AuraEffect const* deathsEmbraceHealBonus = caster->GetAuraEffect(SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_0);
-                    AddPct(pctMod, deathsEmbraceHealBonus->GetAmount());
-                }
-            }
-        }
+        spell_warl_deaths_embrace_impl::HandleDamageOrHealingCalculation(GetCaster(), victim, pctMod, EFFECT_2, EFFECT_3);
     }
 
     void Register() override
     {
-        DoEffectCalcDamageAndHealing += AuraEffectCalcDamageFn(spell_warl_drain_life::CalculateHeal, EFFECT_0, SPELL_AURA_PERIODIC_LEECH);
+        CalcDamage += SpellCalcDamageFn(spell_warl_deaths_embrace::HandleDamageCalculation);
+    }
+};
+
+// Called by 980 - Agony, 146739 - Corruption and 316099 - Unstable Affliction
+class spell_warl_deaths_embrace_dots : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellEffect({ { SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_3 } });
+    }
+
+    void CalculateDamage(AuraEffect const* /*aurEff*/, Unit const* victim, int32& /*damage*/, int32& /*flatMod*/, float& pctMod) const
+    {
+        if (Unit const* caster = GetCaster())
+            spell_warl_deaths_embrace_impl::HandleDamageOrHealingCalculation(caster, victim, pctMod, EFFECT_2, EFFECT_3);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcDamageAndHealing += AuraEffectCalcDamageFn(spell_warl_deaths_embrace_dots::CalculateDamage, EFFECT_ALL, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+};
+
+// 234153 - Drain Life
+class spell_warl_deaths_embrace_drain_life : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellEffect({ { SPELL_WARLOCK_DEATHS_EMBRACE, EFFECT_1 } });
+    }
+
+    void CalculateHeal(AuraEffect const* /*aurEff*/, Unit const* victim, int32& /*damage*/, int32& /*flatMod*/, float& pctMod) const
+    {
+        Unit const* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (caster != victim)   // check who is being targeted, this hook is called for both damage and healing of PERIODIC_LEECH
+            return;
+
+        spell_warl_deaths_embrace_impl::HandleDamageOrHealingCalculation(caster, caster, pctMod, EFFECT_0, EFFECT_1);
+    }
+
+    void Register() override
+    {
+        DoEffectCalcDamageAndHealing += AuraEffectCalcHealingFn(spell_warl_deaths_embrace_drain_life::CalculateHeal, EFFECT_0, SPELL_AURA_PERIODIC_LEECH);
     }
 };
 
@@ -1378,12 +1378,13 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_create_healthstone);
     RegisterSpellScript(spell_warl_dark_pact);
     RegisterSpellScript(spell_warl_demonbolt);
-    RegisterSpellAndAuraScriptPair(spell_warl_deaths_embrace, spell_warl_deaths_embrace_aura);
+    RegisterSpellScript(spell_warl_deaths_embrace);
+    RegisterSpellScript(spell_warl_deaths_embrace_dots);
+    RegisterSpellScript(spell_warl_deaths_embrace_drain_life);
     RegisterSpellScript(spell_warl_demonic_circle_summon);
     RegisterSpellScript(spell_warl_demonic_circle_teleport);
     RegisterSpellScript(spell_warl_devour_magic);
     RegisterSpellScript(spell_warl_doom);
-    RegisterSpellScript(spell_warl_drain_life);
     RegisterSpellScript(spell_warl_drain_soul);
     RegisterSpellScript(spell_warl_haunt);
     RegisterSpellScript(spell_warl_health_funnel);
