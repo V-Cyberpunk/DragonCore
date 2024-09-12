@@ -40,6 +40,7 @@ enum WarlockSpells
     SPELL_WARLOCK_BACKDRAFT_PROC                    = 117828,
     SPELL_WARLOCK_ABSOLUTE_CORRUPTION               = 196103,
     SPELL_WARLOCK_CONFLAGRATE_DEBUFF                = 265931,
+    SPELL_WARLOCK_CONFLAGRATE_ENERGIZE              = 245330,
     SPELL_WARLOCK_AGONY                             = 980,
     SPELL_WARLOCK_CALL_DREADSTALKERS_LEFT           = 193331,
     SPELL_WARLOCK_CALL_DREADSTALKERS_RIGHT          = 193332,
@@ -94,6 +95,27 @@ enum MiscSpells
 {
     SPELL_GEN_REPLENISHMENT                         = 57669,
     SPELL_PRIEST_SHADOW_WORD_DEATH                  = 32409
+};
+
+// 17962 - Conflagrate
+class spell_warl_conflagrate : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo ({ SPELL_WARLOCK_CONFLAGRATE_ENERGIZE });
+    }
+
+    void HandleAfterCast(SpellEffIndex /*effIndex*/) const
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_WARLOCK_CONFLAGRATE_ENERGIZE, CastSpellExtraArgs()
+            .SetTriggerFlags(TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR)
+            .SetTriggeringSpell(GetSpell()));
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_warl_conflagrate::HandleAfterCast, EFFECT_0, SPELL_EFFECT_SCHOOL_DAMAGE);
+    }
 };
 
 // 278350 - Vile Taint
@@ -1375,6 +1397,7 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_call_dreadstalkers);
     RegisterSpellScript(spell_warl_chaos_bolt);
     RegisterSpellScript(spell_warl_chaotic_energies);
+    RegisterSpellScript(spell_warl_conflagrate);
     RegisterSpellScript(spell_warl_create_healthstone);
     RegisterSpellScript(spell_warl_dark_pact);
     RegisterSpellScript(spell_warl_demonbolt);
