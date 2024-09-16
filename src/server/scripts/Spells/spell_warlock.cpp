@@ -65,6 +65,8 @@ enum WarlockSpells
     SPELL_WARLOCK_IMPROVED_HEALTH_FUNNEL_R2         = 18704,
     SPELL_WARLOCK_PERPETUAL_UNSTABILITY_TALENT      = 459376,
     SPELL_WARLOCK_PERPETUAL_UNSTABILITY_DAMAGE      = 459461,
+    SPELL_WARLOCK_PYROGENICS_DEBUFF                 = 387096,
+    SPELL_WARLOCK_PYROGENICS_TALENT                 = 387095,
     SPELL_WARLOCK_RAIN_OF_FIRE                      = 5740,
     SPELL_WARLOCK_RAIN_OF_FIRE_DAMAGE               = 42223,
     SPELL_WARLOCK_ROARING_BLAZE                     = 205184,
@@ -765,6 +767,28 @@ class spell_warl_immolate : public SpellScript
     }
 };
 
+// 387095 - Pyrogenics
+class spell_warl_pyrogenics : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_WARLOCK_PYROGENICS_DEBUFF });
+    }
+
+    void HandleProc(AuraEffect const* aurEff, ProcEventInfo const& procInfo) const
+    {
+        GetTarget()->CastSpell(procInfo.GetActionTarget(), SPELL_WARLOCK_PYROGENICS_DEBUFF, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringAura = aurEff
+        });
+    }
+
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_warl_pyrogenics::HandleProc, EFFECT_0, SPELL_AURA_ADD_FLAT_MODIFIER_BY_SPELL_LABEL);
+    }
+};
+
 // Called by 316099 - Unstable Affliction
 // 459376 - Perpetual Unstability
 class spell_warl_perpetual_unstability : public SpellScript
@@ -1455,6 +1479,7 @@ void AddSC_warlock_spell_scripts()
     RegisterSpellScript(spell_warl_healthstone_heal);
     RegisterSpellScript(spell_warl_immolate);
     RegisterSpellScript(spell_warl_perpetual_unstability);
+    RegisterSpellScript(spell_warl_pyrogenics);
     RegisterSpellScript(spell_warl_random_sayaad);
     RegisterSpellScript(spell_warl_roaring_blaze);
     RegisterSpellScript(spell_warl_sayaad_precast_disorientation);
