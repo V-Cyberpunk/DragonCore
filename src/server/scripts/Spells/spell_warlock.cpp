@@ -54,6 +54,7 @@ enum WarlockSpells
     SPELL_WARLOCK_DEVOUR_MAGIC_HEAL                 = 19658,
     SPELL_WARLOCK_DOOM_ENERGIZE                     = 193318,
     SPELL_WARLOCK_DRAIN_SOUL_ENERGIZE               = 205292,
+    SPELL_WARLOCK_FLAMESHADOW                       = 37379,
     SPELL_WARLOCK_GLYPH_OF_DEMON_TRAINING           = 56249,
     SPELL_WARLOCK_GLYPH_OF_SOUL_SWAP                = 56226,
     SPELL_WARLOCK_GLYPH_OF_SUCCUBUS                 = 56250,
@@ -70,6 +71,7 @@ enum WarlockSpells
     SPELL_WARLOCK_SEED_OF_CORRUPTION_DAMAGE         = 27285,
     SPELL_WARLOCK_SEED_OF_CORRUPTION_GENERIC        = 32865,
     SPELL_WARLOCK_SHADOW_BOLT_ENERGIZE              = 194192,
+    SPELL_WARLOCK_SHADOWFLAME                       = 37378,
     SPELL_WARLOCK_SIPHON_LIFE_HEAL                  = 453000,
     SPELL_WARLOCK_SOULSHATTER_EFFECT                = 32835,
     SPELL_WARLOCK_SOUL_SWAP_CD_MARKER               = 94229,
@@ -86,6 +88,8 @@ enum WarlockSpells
     SPELL_WARLOCK_STRENGTHEN_PACT_INCUBUS           = 366325,
     SPELL_WARLOCK_SUCCUBUS_PACT                     = 365360,
     SPELL_WARLOCK_INCUBUS_PACT                      = 365355,
+    SPELL_WARLOCK_UNSTABLE_AFFLICTION_DAMAGE        = 196364,
+    SPELL_WARLOCK_UNSTABLE_AFFLICTION_ENERGIZE      = 31117,
     SPELL_WARLOCK_VILE_TAINT_DAMAGE                 = 386931,
     SPELL_WARLOCK_VOLATILE_AGONY_TALENT             = 453034,
     SPELL_WARLOCK_VOLATILE_AGONY_DAMAGE             = 453035
@@ -156,11 +160,18 @@ class spell_warl_backdraft : public SpellScript
         return ValidateSpellInfo ({ SPELL_WARLOCK_BACKDRAFT, SPELL_WARLOCK_BACKDRAFT_PROC });
     }
 
-    void HandleAfterCast()
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_WARLOCK_BACKDRAFT);
+    }
+
+    void HandleAfterCast() const
     {
         Unit* caster = GetCaster();
-        if (caster->HasAura(SPELL_WARLOCK_BACKDRAFT))
-            caster->CastSpell(caster, SPELL_WARLOCK_BACKDRAFT_PROC, true);
+        caster->CastSpell(caster, SPELL_WARLOCK_BACKDRAFT_PROC, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringSpell = GetSpell()
+        });
     }
 
     void Register() override
