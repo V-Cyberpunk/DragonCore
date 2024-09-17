@@ -16,8 +16,8 @@
  */
 
 /*
- * Scripts for spells used by dragonriding and advanced fly spells.
- * Scriptnames of files in this file should be prefixed with "spell_af_".
+ * Scripts for spells with SPELLFAMILY_GENERIC spells used by dragonrider and advanced fly spells.
+ * Scriptnames of files in this file should be prefixed with "spell_dr_".
  */
 
 #include "Containers.h"
@@ -34,10 +34,13 @@
 
 enum AdvancedFlyingSpells
 {
-    SPELL_DRAGONRIDER_ENERGIZE  = 372606,
-    SPELL_VIGOR_CACHE           = 433547,
-    SPELL_RIDING_ABROAD         = 432503, // TODO outside of dragon isles
-    SPELL_ENERGY_WIDGET         = 423624,
+    SPELL_DRAGONRIDER_ENERGIZE      = 372606,
+    SPELL_VIGOR_CACHE               = 433547,
+    SPELL_RIDING_ABROAD             = 432503, // TODO outside of dragon isles
+    SPELL_ENERGY_WIDGET             = 423624,
+    SWITCH_AF_REGULAR               = 404468,
+    SWITCH_AF_DRAGONRIDING          = 404464
+
 };
 
 // 373646 - Soar (Racial)
@@ -47,8 +50,11 @@ class spell_af_skyriding : public AuraScript
 {
     void OnApply(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
     {
-        GetTarget()->CastSpell(GetTarget(), SPELL_ENERGY_WIDGET, true);
-        GetTarget()->SetPower(POWER_ALTERNATE_MOUNT, GetTarget()->GetPower(POWER_ALTERNATE_MOUNT), true);
+        if (GetCaster()->HasAura(SWITCH_AF_DRAGONRIDING))
+        {
+            GetTarget()->CastSpell(GetTarget(), SPELL_ENERGY_WIDGET, TRIGGERED_FULL_MASK);
+            GetTarget()->SetPower(POWER_ALTERNATE_MOUNT, GetTarget()->GetPower(POWER_ALTERNATE_MOUNT), true);
+        }
     }
 
     void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
@@ -58,8 +64,8 @@ class spell_af_skyriding : public AuraScript
 
     void Register() override
     {
-        OnEffectApply += AuraEffectApplyFn(spell_af_skyriding::OnApply, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
-        OnEffectRemove += AuraEffectRemoveFn(spell_af_skyriding::OnRemove, EFFECT_0, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectApply += AuraEffectApplyFn(spell_af_skyriding::OnApply, EFFECT_2, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        OnEffectRemove += AuraEffectRemoveFn(spell_af_skyriding::OnRemove, EFFECT_2, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -102,6 +108,23 @@ class spell_af_energy : public AuraScript
                     subAmountAurEff->SetAmount(newAmount);
                     subAmountAurEff->GetBase()->SetNeedClientUpdateForTargets();
                 }
+
+                int newMaxPower = 3;
+
+                if (caster->HasAura(377920) && !caster->HasAura(377921) && !caster->HasAura(377922))
+                {
+                    newMaxPower = 4;
+                }
+                else if (caster->HasAura(377921) && caster->HasAura(377920) && !caster->HasAura(377922))
+                {
+                    newMaxPower = 5;
+                }
+                else if (caster->HasAura(377922) && caster->HasAura(377921) && caster->HasAura(377920))
+                {
+                    newMaxPower = 6;
+                }
+
+                caster->SetMaxPower(POWER_ALTERNATE_MOUNT, newMaxPower);
             }
         }
     }
@@ -201,6 +224,41 @@ class spell_af_whirling_surge : public SpellScript
     }
 };
 
+// 436854 - Switch Flight Style
+class spell_switch_flight : public SpellScript
+{
+    PrepareSpellScript(spell_switch_flight);
+
+    void HandleDummy(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        if (!caster)
+            return;
+
+        if (!caster->HasAura(SWITCH_AF_REGULAR) && !caster->HasAura(SWITCH_AF_DRAGONRIDING))
+        {
+            caster->CastSpell(caster, SWITCH_AF_REGULAR, TRIGGERED_FULL_MASK);
+        }
+        else if (!caster->HasAura(SWITCH_AF_REGULAR))
+        {
+            caster->RemoveAura(SWITCH_AF_DRAGONRIDING);
+            caster->CastSpell(caster, SWITCH_AF_REGULAR, TRIGGERED_FULL_MASK);
+        }
+        else if (!caster->HasAura(SWITCH_AF_DRAGONRIDING))
+        {
+            caster->RemoveAura(SWITCH_AF_REGULAR);
+            caster->CastSpell(caster, SWITCH_AF_DRAGONRIDING, TRIGGERED_FULL_MASK);
+        }
+
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_switch_flight::HandleDummy, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+
 void AddSC_advanced_flying_spell_scripts()
 {
     RegisterSpellScript(spell_af_skyriding);
@@ -208,4 +266,5 @@ void AddSC_advanced_flying_spell_scripts()
     RegisterSpellScript(spell_af_skyward_ascent);
     RegisterSpellScript(spell_af_surge_forward);
     RegisterSpellScript(spell_af_whirling_surge);
+    RegisterSpellScript(spell_switch_flight);
 }
