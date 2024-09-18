@@ -1,0 +1,12 @@
+DROP TRIGGER IF EXISTS ProfessionTailoring;
+DROP TRIGGER IF EXISTS ProfessionSkinning;
+DROP TRIGGER IF EXISTS ProfessionMining;
+DROP TRIGGER IF EXISTS ProfessionLeatherworking;
+DROP TRIGGER IF EXISTS ProfessionJewelCraft;
+DROP TRIGGER IF EXISTS ProfessionInscription;
+DROP TRIGGER IF EXISTS ProfessionHerbGathering;
+DROP TRIGGER IF EXISTS ProfessionFishing;
+DROP TRIGGER IF EXISTS ProfessionEngineering;
+DROP TRIGGER IF EXISTS ProfessionEnch;
+DROP TRIGGER IF EXISTS ProfessionCook;
+DROP TRIGGER IF EXISTS ProfessionBlackSmith;

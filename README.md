@@ -8,11 +8,12 @@ Data, Launcher and DB are in the Release section.<br><br>
 
 * supports Dragonflight 10.2.7.55664
 * dragonriding
+* crafting
+* map questmarker
+* reagent bag and bag sorting
 * offline extractor tools
 * connection_patcher
 * cert_creator
-* map questmarker
-* reagent bag and bag sorting
 
 ## connection_patcher / cert_creator How To
 
