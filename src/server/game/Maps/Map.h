@@ -547,6 +547,11 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
 
         virtual std::string GetDebugInfo() const;
 
+        std::set<ObjectGuid>& GetInfiniteGameObjects() { return m_infiniteGameObjects; };
+
+        void AddInfiniteGameObject(ObjectGuid object) { m_infiniteGameObjects.insert(object); };
+        void RemoveInfiniteGameObject(ObjectGuid object) { m_infiniteGameObjects.erase(object); };
+
     private:
 
         void SetTimer(uint32 t) { i_gridExpiry = t < MIN_GRID_DELAY ? MIN_GRID_DELAY : t; }
@@ -619,6 +624,10 @@ class TC_GAME_API Map : public GridRefManager<NGridType>
         MapRefManager::iterator m_mapRefIter;
 
         int32 m_VisibilityNotifyPeriod;
+
+        typedef std::set<ObjectGuid> InfiniteGameObjects;
+        InfiniteGameObjects m_infiniteGameObjects;
+        InfiniteGameObjects::iterator m_infiniteGameObjectsIter;
 
         typedef std::set<WorldObject*> ActiveNonPlayers;
         ActiveNonPlayers m_activeNonPlayers;
