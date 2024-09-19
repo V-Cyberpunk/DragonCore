@@ -3179,6 +3179,86 @@ bool Unit::IsMovementPreventedByCasting() const
     return true;
 }
 
+void Unit::AddSummonedCreature(ObjectGuid guid, uint32 entry)
+{
+    m_SummonedCreatures[guid] = entry;
+}
+
+void Unit::RemoveSummonedCreature(ObjectGuid guid)
+{
+    m_SummonedCreatures.erase(guid);
+}
+
+Creature* Unit::GetSummonedCreatureByEntry(uint32 entry)
+{
+    auto itr = std::find_if(m_SummonedCreatures.begin(), m_SummonedCreatures.end(), [entry](auto& p)
+    {
+        return p.second == entry;
+    });
+
+    if (itr == m_SummonedCreatures.end())
+        return nullptr;
+
+    return ObjectAccessor::GetCreature(*this, itr->first);
+}
+
+int32 Unit::GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const
+{
+    if (!IsPlayer())
+    {
+        if (GetOwner())
+        {
+            if (Player* ownerPlayer = GetOwner()->ToPlayer())
+            {
+                if (IsTotem())
+                    return GetOwner()->GetTotalSpellPowerValue(mask, heal);
+                else
+                {
+                    if (IsPet())
+                        return ownerPlayer->m_activePlayerData->PetSpellPower;
+                    else if (IsGuardian())
+                        return ((Guardian*)this)->GetBonusDamage();
+                }
+            }
+        }
+
+        if (heal)
+            return SpellBaseHealingBonusDone(mask);
+        else
+            return SpellBaseDamageBonusDone(mask);
+    }
+
+    Player const* thisPlayer = ToPlayer();
+
+    int32 sp = 0;
+
+    if (heal)
+        sp = thisPlayer->m_activePlayerData->ModHealingDonePos;
+    else
+    {
+        int32 counter = 0;
+        for (uint32 i = 1; i < MAX_SPELL_SCHOOL; i++)
+        {
+            if (mask & (1 << i))
+            {
+                sp += thisPlayer->m_activePlayerData->ModDamageDonePos[i];
+                counter++;
+            }
+        }
+        if (counter > 0)
+            sp /= counter;
+    }
+
+    return std::max(sp, 0); //avoid negative spell power
+}
+
+void Unit::UnsummonCreatureByEntry(uint32 entry, uint32 ms/* = 0*/)
+{
+    if (Creature* creature = GetSummonedCreatureByEntry(entry))
+        if (TempSummon* tempSummon = creature->ToTempSummon())
+            tempSummon->UnSummon(ms);
+}
+
 bool Unit::CanCastSpellWhileMoving(SpellInfo const* spellInfo) const
 {
     if (spellInfo->HasAttribute(SPELL_ATTR13_DO_NOT_ALLOW_DISABLE_MOVEMENT_INTERRUPT))
@@ -14107,4 +14187,75 @@ DeclinedName::DeclinedName(UF::DeclinedNames const& uf)
 {
     for (std::size_t i = 0; i < MAX_DECLINED_NAME_CASES; ++i)
         name[i] = uf.Name[i];
+}
+
+void Unit::GetFriendlyUnitListInRange(std::list<Unit*>& list, float fMaxSearchRange, bool exceptSelf /*= false*/) const
+{
+    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    Cell cell(p);
+    cell.SetNoCreate();
+
+    Trinity::AnyFriendlyUnitInObjectRangeCheck u_check(this, this, fMaxSearchRange, false, exceptSelf);
+    Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck> searcher(this, list, u_check);
+
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AnyFriendlyUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+
+    cell.Visit(p, world_unit_searcher, *GetMap(), *this, fMaxSearchRange);
+    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, fMaxSearchRange);
+}
+
+void Unit::GetAttackableUnitListInRange(std::list<Unit*>& list, float fMaxSearchRange) const
+{
+    CellCoord p(Trinity::ComputeCellCoord(GetPositionX(), GetPositionY()));
+    Cell cell(p);
+    cell.SetNoCreate();
+
+    Trinity::AttackableUnitInObjectRangeCheck u_check(this, fMaxSearchRange);
+    Trinity::UnitListSearcher<Trinity::AttackableUnitInObjectRangeCheck> searcher(this, list, u_check);
+
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AttackableUnitInObjectRangeCheck>, WorldTypeMapContainer > world_unit_searcher(searcher);
+    TypeContainerVisitor<Trinity::UnitListSearcher<Trinity::AttackableUnitInObjectRangeCheck>, GridTypeMapContainer >  grid_unit_searcher(searcher);
+
+    cell.Visit(p, world_unit_searcher, *GetMap(), *this, fMaxSearchRange);
+    cell.Visit(p, grid_unit_searcher, *GetMap(), *this, fMaxSearchRange);
+}
+
+int32 Unit::GetAuraEffectAmount(AuraType auraType, SpellFamilyNames spellFamilyName, uint32 /*IconFileDataId*/, uint8 /*effIndex*/) const
+{
+    if (AuraEffect* aurEff = GetAuraEffect(auraType, spellFamilyName))
+        return aurEff->GetAmount();
+
+    return 0;
+}
+
+int32 Unit::GetAuraEffectAmount(uint32 spellId, uint8 effIndex, ObjectGuid casterGuid) const
+{
+    if (AuraEffect* aurEff = GetAuraEffect(spellId, effIndex, casterGuid))
+        return aurEff->GetAmount();
+
+    return 0;
+}
+
+void Unit::RemoveAllAreaObjects()
+{
+    while (!m_AreaObj.empty())
+    {
+        m_AreaObj.front()->Remove();
+    }
+}
+
+Unit::AuraApplicationVector Unit::GetTargetAuraApplications(uint32 spellId) const
+{
+    AuraApplicationVector aurApps;
+
+    auto bounds = m_targetAuras.equal_range(spellId);
+    for (auto itr = bounds.first; itr != bounds.second; ++itr)
+    {
+        if (Unit* target = ObjectAccessor::GetUnit(*this, itr->second))
+            if (AuraApplication* aurApp = target->GetAuraApplication(itr->first, GetGUID()))
+                aurApps.push_back(aurApp);
+    }
+
+    return aurApps;
 }

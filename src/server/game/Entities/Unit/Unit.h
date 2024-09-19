@@ -22,6 +22,7 @@
 #include "CombatManager.h"
 #include "FlatSet.h"
 #include "SpellAuraDefines.h"
+#include "TaskScheduler.h"
 #include "ThreatManager.h"
 #include "Timer.h"
 #include "UnitDefines.h"
@@ -1496,6 +1497,28 @@ class TC_GAME_API Unit : public WorldObject
         std::array<ObjectGuid, MAX_SUMMON_SLOT> m_SummonSlot;
         std::array<ObjectGuid, MAX_GAMEOBJECT_SLOT> m_ObjectSlot;
 
+        void AddSummonedCreature(ObjectGuid guid, uint32 entry);
+        void RemoveSummonedCreature(ObjectGuid guid);
+        Creature* GetSummonedCreatureByEntry(uint32 entry);
+        int32 GetTotalSpellPowerValue(SpellSchoolMask mask, bool heal) const;
+        void UnsummonCreatureByEntry(uint32 entry, uint32 ms = 0);
+
+
+        /// Add timed delayed operation
+        /// @p_Timeout  : Delay time
+        /// @p_Function : Callback function
+        void AddDelayedEvent(uint32 timeout, std::function<void()>&& function)
+        {
+            emptyWarned = false;
+            timedDelayedOperations.push_back(std::pair<uint32, std::function<void()>>(timeout, function));
+        }
+        std::vector<std::pair<int32, std::function<void()>>>timedDelayedOperations; ///< Delayed operations
+        bool emptyWarned; ///< Warning when there are no more delayed operations
+
+        void GetAttackableUnitListInRange(std::list<Unit*>& list, float fMaxSearchRange) const;
+        int32 GetAuraEffectAmount(AuraType auraType, SpellFamilyNames spellFamilyName, uint32 IconFileDataId, uint8 effIndex) const;
+        int32 GetAuraEffectAmount(uint32 spellId, uint8 effIndex, ObjectGuid casterGuid = ObjectGuid::Empty) const;
+
         ShapeshiftForm GetShapeshiftForm() const { return ShapeshiftForm(*m_unitData->ShapeshiftForm); }
         void SetShapeshiftForm(ShapeshiftForm form);
 
@@ -1622,6 +1645,7 @@ class TC_GAME_API Unit : public WorldObject
         void AddGameObject(GameObject* gameObj);
         void RemoveGameObject(GameObject* gameObj, bool del);
         void RemoveGameObject(uint32 spellid, bool del);
+        void RemoveAllAreaObjects();//new
         void RemoveAllGameObjects();
 
         // AreaTrigger management
@@ -1836,6 +1860,8 @@ class TC_GAME_API Unit : public WorldObject
         uint16 GetVirtualItemAppearanceMod(uint32 slot) const;
         void SetVirtualItem(uint32 slot, uint32 itemId, uint16 appearanceModId = 0, uint16 itemVisual = 0);
 
+        void GetFriendlyUnitListInRange(std::list<Unit*>& list, float fMaxSearchRange, bool exceptSelf = false) const;
+
         // returns if the unit can't enter combat
         bool IsCombatDisallowed() const { return _isCombatDisallowed; }
         // enables / disables combat interaction of this unit
@@ -1978,6 +2004,9 @@ class TC_GAME_API Unit : public WorldObject
         void AtStartOfEncounter(EncounterType type);
         void AtEndOfEncounter(EncounterType type);
 
+        typedef std::list<AreaTrigger*> AreaObjectList;//new
+        AreaObjectList m_AreaObj; //new
+
     private:
 
         void UpdateSplineMovement(uint32 t_diff);
@@ -2042,9 +2071,21 @@ class TC_GAME_API Unit : public WorldObject
         std::unique_ptr<MovementForces> _movementForces;
         PositionUpdateInfo _positionUpdateInfo;
 
+        std::unordered_map<ObjectGuid, uint32/*entry*/> m_SummonedCreatures;
+
         bool _isCombatDisallowed;
 
         std::array<float, ADV_FLYING_MAX_SPEED_TYPE> _advFlyingSpeeds;
+
+    public:
+        TaskScheduler _scheduler;
+        TaskScheduler& GetScheduler() { return _scheduler; }
+
+    public:
+        typedef std::unordered_multimap<uint32 /*spellId*/, ObjectGuid /*targetGuid*/> TargetAuraContainer;
+        TargetAuraContainer m_targetAuras;
+        typedef std::vector<AuraApplication*> AuraApplicationVector;
+        Unit::AuraApplicationVector GetTargetAuraApplications(uint32 spellId) const;
 };
 
 #endif
