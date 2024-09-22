@@ -1167,6 +1167,24 @@ class spell_dk_marrowrend : public SpellScript
     }
 };
 
+// 376905 - Unleashed Frenzy
+class spell_dk_unleashed_frenzy : public AuraScript
+{
+    bool CheckProc(AuraEffect const* /*aurEff*/, ProcEventInfo& eventInfo)
+    {
+        if (Spell const* procSpell = eventInfo.GetProcSpell())
+            if (Optional<int32> cost = procSpell->GetPowerTypeCostAmount(POWER_RUNIC_POWER))
+                return cost > 0;
+
+        return false;
+    }
+
+    void Register() override
+    {
+        DoCheckEffectProc += AuraCheckEffectProcFn(spell_dk_unleashed_frenzy::CheckProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL_WITH_VALUE);
+    }
+};
+
 void AddSC_deathknight_spell_scripts()
 {
     RegisterSpellScript(spell_dk_advantage_t10_4p);
@@ -1204,6 +1222,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_rime);
     RegisterSpellScript(spell_dk_soul_reaper);
     RegisterSpellScript(spell_dk_t20_2p_rune_empowered);
+    RegisterSpellScript(spell_dk_unleashed_frenzy);
     RegisterSpellScript(spell_dk_vampiric_blood);
     RegisterSpellScript(spell_dk_marrowrend);
 
