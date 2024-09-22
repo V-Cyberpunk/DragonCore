@@ -51,10 +51,12 @@ enum DeathKnightSpells
     SPELL_DK_BONE_SHIELD                        = 195181,
     SPELL_DK_BREATH_OF_SINDRAGOSA               = 152279,
     SPELL_DK_BRITTLE_DEBUFF                     = 374557,
+    SPELL_DK_CLEAVING_STRIKES                   = 316916,
     SPELL_DK_CORPSE_EXPLOSION_TRIGGERED         = 43999,
     SPELL_DK_DARK_SIMULACRUM_BUFF               = 77616,
     SPELL_DK_DARK_SIMULACRUM_SPELLPOWER_BUFF    = 94984,
     SPELL_DK_DEATH_AND_DECAY_DAMAGE             = 52212,
+    SPELL_DK_DEATH_AND_DECAY_INCREASE_TARGETS   = 188290,
     SPELL_DK_DEATH_COIL_DAMAGE                  = 47632,
     SPELL_DK_DEATH_GRIP_DUMMY                   = 243912,
     SPELL_DK_DEATH_GRIP_JUMP                    = 49575,
@@ -453,6 +455,25 @@ class spell_dk_death_and_decay : public AuraScript
     void Register() override
     {
         OnEffectPeriodic += AuraEffectPeriodicFn(spell_dk_death_and_decay::HandleDummyTick, EFFECT_2, SPELL_AURA_PERIODIC_DUMMY);
+    }
+};
+
+// 188290 - Death and Decay (triggered by 316916 - Cleaving Strikes)
+class spell_dk_death_and_decay_increase_targets : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spell*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DK_UNHOLY_GROUND_HASTE });
+    }
+
+    void OnRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_DK_UNHOLY_GROUND_HASTE);
+    }
+
+    void Register() override
+    {
+        OnEffectRemove += AuraEffectRemoveFn(spell_dk_death_and_decay_increase_targets::OnRemove, EFFECT_0, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1105,6 +1126,9 @@ struct at_dk_death_and_decay : AreaTriggerAI
         {
             if (caster == unit)
             {
+                if (caster->HasAura(SPELL_DK_CLEAVING_STRIKES))
+                    caster->CastSpell(caster, SPELL_DK_DEATH_AND_DECAY_INCREASE_TARGETS);
+
                 if (caster->HasAura(SPELL_DK_UNHOLY_GROUND_TALENT))
                     caster->CastSpell(caster, SPELL_DK_UNHOLY_GROUND_HASTE);
             }
@@ -1113,7 +1137,8 @@ struct at_dk_death_and_decay : AreaTriggerAI
 
     void OnUnitExit(Unit* unit) override
     {
-        unit->RemoveAurasDueToSpell(SPELL_DK_UNHOLY_GROUND_HASTE);
+        if (!unit->HasAura(SPELL_DK_CLEAVING_STRIKES))
+            unit->RemoveAurasDueToSpell(SPELL_DK_UNHOLY_GROUND_HASTE);
     }
 };
 
@@ -1156,6 +1181,7 @@ void AddSC_deathknight_spell_scripts()
     RegisterSpellScript(spell_dk_dark_simulacrum);
     RegisterSpellScript(spell_dk_dark_simulacrum_buff);
     RegisterSpellScript(spell_dk_death_and_decay);
+    RegisterSpellScript(spell_dk_death_and_decay_increase_targets);
     RegisterSpellScript(spell_dk_death_coil);
     RegisterSpellScript(spell_dk_death_gate);
     RegisterSpellScript(spell_dk_death_grip_initial);
