@@ -47,6 +47,10 @@
 #include <openssl/pem.h>
 #include <openssl/err.h>
 
+#ifdef _WIN32
+#include <openssl/applink.c>
+#endif
+
 std::string domain;
 
 /* Generates a 4096-bit RSA key. */
