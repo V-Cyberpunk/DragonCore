@@ -428,7 +428,7 @@ public:
                     GetCreatureListWithEntryInGrid(crList, me, 54588, 4.5f);
                     for (auto& creature : crList)
                     {
-                        if (creature->isInFront(me, M_PI/1.5f) && !creature->HasAura(102341))
+                        if (creature->isInFront(me, 3.14f/1.5f) && !creature->HasAura(102341))
                         {
                             target = creature->GetGUID();
                             me->StopMoving();
@@ -450,7 +450,7 @@ public:
                 else
                 {
                     Unit* targetUnit = ObjectAccessor::GetUnit(*me, target);
-                    if (targetUnit && targetUnit->IsWithinDist(me, 7.0f, true) && targetUnit->isInFront(me, M_PI/1.5f))
+                    if (targetUnit && targetUnit->IsWithinDist(me, 7.0f, true) && targetUnit->isInFront(me, 3.14f/1.5f))
                     {
                         targetUnit->CastSpell(targetUnit, 100626, true);
                         me->DealDamage(me, targetUnit, (targetUnit->GetMaxHealth() / 2) + 1);
