@@ -180,7 +180,7 @@ public:
                 }
                 else
                     me->AddAura(SPELL_TARGET_MISS, player);
-                    player->RemoveAurasDueToSpell(SPELL_CANON_DEFLAGRATION);
+                player->RemoveAurasDueToSpell(SPELL_CANON_DEFLAGRATION);
 
                 for (uint8 i = 0; i < creditCount; ++i)
                     player->CastSpell(player, SPELL_TARGET_CREDIT, false);
@@ -203,7 +203,7 @@ public:
             if (me->IsQuestGiver())
                 player->PrepareQuestMenu(me->GetGUID());
 
-                AddGossipItemFor(player, GossipOptionNpc::None, "Teleport me to the cannon |cFF0000FF(30 silver)|r", GOSSIP_SENDER_MAIN, 0);
+            AddGossipItemFor(player, GossipOptionNpc::None, "Teleport me to the cannon |cFF0000FF(30 silver)|r", GOSSIP_SENDER_MAIN, 0);
 
             player->PlayerTalkClass->SendGossipMenu(player->GetGossipTextId(me), me->GetGUID());
             return true;

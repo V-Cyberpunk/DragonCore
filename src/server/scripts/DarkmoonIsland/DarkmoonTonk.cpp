@@ -113,7 +113,7 @@ public:
 
         bool Active;
 
-        void Reset()
+        void Reset() override
         {
             Active = false;
         }
@@ -129,7 +129,7 @@ public:
             }
         }
 
-        void UpdateAI(uint32 diff)
+        void UpdateAI(uint32 diff) override
         {
             events.Update(diff);
 

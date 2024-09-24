@@ -103,7 +103,7 @@ public:
         int8 targetIndex;
         ObjectGuid targetList[3];
 
-        void Reset()
+        void Reset() override
         {
             nextQuoteTimer = urand(1, 60) * 1000;
             nextQuote = 0;
@@ -111,7 +111,7 @@ public:
             targetIndex = -1;
         }
 
-        void UpdateAI(const uint32 diff)
+        void UpdateAI(const uint32 diff) override
         {
             if (nextTargetChangeTimer <= diff)
             {
