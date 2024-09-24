@@ -40,12 +40,12 @@
 
 // Database updater base information
 #define DATABASE_MYSQL_EXECUTABLE   R"(@MYSQL_EXECUTABLE@)"
-#define DATABASE_FULL_DATABASE      "TDB_full_world_1102.24091_2024_09_03.sql"
-#define DATABASE_HOTFIXES_DATABASE  "TDB_full_hotfixes_1102.24091_2024_09_03.sql"
+#define DATABASE_FULL_DATABASE      "RetailCoreDB_world.sql"
+#define DATABASE_HOTFIXES_DATABASE  "RetailCoreDB_hotfixes.sql"
 
 // Windows resource defines
-#define VER_COMPANYNAME_STR         "TrinityCore Developers"
-#define VER_LEGALCOPYRIGHT_STR      "(c)2008-@rev_year@ TrinityCore"
+#define VER_COMPANYNAME_STR         "DragonCore Developers"
+#define VER_LEGALCOPYRIGHT_STR      "(c)2024-@rev_year@ DragonCore"
 #define VER_FILEVERSION             0,0,0
 #define VER_FILEVERSION_STR         "@rev_hash@ @rev_date@ (@rev_branch@ branch)"
 #define VER_PRODUCTVERSION          VER_FILEVERSION
