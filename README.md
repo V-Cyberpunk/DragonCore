@@ -2,7 +2,7 @@
 
 DragonCore is a derivative of the last Dragonflight revision from TrinityCore and last Dragonflight RetailCore DB!<br>
 Target version is 10.2.7.<br>
-Data, Launcher and DB are in the Release section.<br><br>
+DB and Data files are in the Release section.<br><br>
 
 ## DragonCore Features
 
