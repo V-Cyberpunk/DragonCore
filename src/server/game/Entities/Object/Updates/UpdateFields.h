@@ -260,14 +260,18 @@ struct PassiveSpellHistory : public IsUpdateFieldStructureTag
 struct UnitData : public IsUpdateFieldStructureTag, public HasChangesMask<217>
 {
     UpdateField<std::vector<uint32>, 0, 1> StateWorldEffectIDs;
+    struct StateWorldEffectIDsTag : ViewerDependentValueTag<std::vector<uint32>> {};
     DynamicUpdateField<UF::PassiveSpellHistory, 0, 2> PassiveSpells;
     DynamicUpdateField<int32, 0, 3> WorldEffects;
     DynamicUpdateField<ObjectGuid, 0, 4> ChannelObjects;
     UpdateField<int32, 0, 5> DisplayID;
     struct DisplayIDTag : ViewerDependentValueTag<int32> {};
     UpdateField<uint32, 0, 6> StateSpellVisualID;
+    struct StateSpellVisualIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 7> StateAnimID;
+    struct StateAnimIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 8> StateAnimKitID;
+    struct StateAnimKitIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 9> StateWorldEffectsQuestObjectiveID;
     UpdateField<int32, 0, 10> SpellOverrideNameID;
     UpdateField<ObjectGuid, 0, 11> Charm;
@@ -1050,13 +1054,17 @@ struct ActivePlayerData : public IsUpdateFieldStructureTag, public HasChangesMas
 struct GameObjectData : public IsUpdateFieldStructureTag, public HasChangesMask<25>
 {
     UpdateField<std::vector<uint32>, 0, 1> StateWorldEffectIDs;
+    struct StateWorldEffectIDsTag : ViewerDependentValueTag<std::vector<uint32>> {};
     DynamicUpdateField<int32, 0, 2> EnableDoodadSets;
     DynamicUpdateField<int32, 0, 3> WorldEffects;
     UpdateField<int32, 0, 4> DisplayID;
     UpdateField<uint32, 0, 5> SpellVisualID;
     UpdateField<uint32, 0, 6> StateSpellVisualID;
+    struct StateSpellVisualIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 7> SpawnTrackingStateAnimID;
+    struct StateAnimIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 8> SpawnTrackingStateAnimKitID;
+    struct StateAnimKitIDTag : ViewerDependentValueTag<uint32> {};
     UpdateField<uint32, 0, 9> StateWorldEffectsQuestObjectiveID;
     UpdateField<ObjectGuid, 0, 10> CreatedBy;
     UpdateField<ObjectGuid, 0, 11> GuildGUID;
