@@ -44,6 +44,7 @@ CREATE TABLE `account` (
   `mutetime` bigint NOT NULL DEFAULT '0',
   `mutereason` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `muteby` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
+  `client_build` int unsigned NOT NULL DEFAULT '0',
   `locale` tinyint unsigned NOT NULL DEFAULT '0',
   `os` varchar(4) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `timezone_offset` smallint NOT NULL DEFAULT '0',
