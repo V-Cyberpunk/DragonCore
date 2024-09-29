@@ -143,7 +143,7 @@ public:
     bool Validate(SpellInfo const* spellInfo) override
     {
         return ValidateSpellInfo({ SPELL_DK_RUNIC_POWER_ENERGIZE })
-            && ValidateSpellEffect({ { spellInfo->Id, EFFECT_1 } });
+            && ValidateSpellEffect({ { spellInfo->Id, EFFECT_1 }, { SPELL_DK_ANTI_MAGIC_BARRIER, EFFECT_2 } });
     }
 
     bool Load() override
