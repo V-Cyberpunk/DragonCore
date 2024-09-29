@@ -285,7 +285,8 @@ ObjectGuid ChannelMgr::CreateBuiltinChannelGuid(uint32 channelId, AreaTableEntry
     if (zoneEntry && channelEntry->GetFlags().HasFlag(ChatChannelFlags::ZoneBased) && !channelEntry->GetFlags().HasFlag(ChatChannelFlags::LinkedChannel))
         zoneId = zoneEntry->ID;
 
-    if (std::shared_ptr<Realm const> currentRealm = sRealmList->GetCurrentRealm())
+    if (channelEntry->GetFlags().HasFlag(ChatChannelFlags::GlobalForTournament))
+        if (std::shared_ptr<Realm const> currentRealm = sRealmList->GetCurrentRealm())
             if (Cfg_CategoriesEntry const* category = sCfgCategoriesStore.LookupEntry(currentRealm->Timezone))
                 if (category->GetFlags().HasFlag(CfgCategoriesFlags::Tournament))
                     zoneId = 0;
