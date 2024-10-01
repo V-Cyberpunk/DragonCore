@@ -2499,7 +2499,7 @@ CREATE TABLE `uptime` (
   `starttime` int unsigned NOT NULL DEFAULT '0',
   `uptime` int unsigned NOT NULL DEFAULT '0',
   `maxplayers` smallint unsigned NOT NULL DEFAULT '0',
-  `revision` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Trinitycore',
+  `revision` varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'Dragoncore',
   PRIMARY KEY (`realmid`,`starttime`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Uptime system';
 /*!40101 SET character_set_client = @saved_cs_client */;
