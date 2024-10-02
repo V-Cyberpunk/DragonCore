@@ -714,7 +714,7 @@ void CriteriaHandler::UpdateCriteria(CriteriaType type, uint64 miscValue1 /*= 0*
                     SkillLineAbilityMapBounds bounds = sSpellMgr->GetSkillLineAbilityMapBounds(spellId);
                     for (SkillLineAbilityMap::const_iterator skillIter = bounds.first; skillIter != bounds.second; ++skillIter)
                     {
-                        if (skillIter->second->SkillLine == int32(criteria->Entry->Asset.SkillID))
+                        if (skillIter->second->SkillLine == uint32(criteria->Entry->Asset.SkillID))
                         {
                             // do not add couter twice if by any chance skill is listed twice in dbc (eg. skill 777 and spell 22717)
                             ++spellCount;
@@ -2445,7 +2445,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == int32(secondaryAsset) && follower.HasAbility(reqValue);;
+                return followerBuilding->BuildingType == secondaryAsset && follower.HasAbility(reqValue);;
             });
             if (followerCount < 1)
                 return false;
@@ -2464,7 +2464,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == int32(secondaryAsset) && follower.HasAbility(reqValue);;
+                return followerBuilding->BuildingType == secondaryAsset && follower.HasAbility(reqValue);;
             });
             if (followerCount < 1)
                 return false;
@@ -2482,7 +2482,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 GarrBuildingEntry const* followerBuilding = sGarrBuildingStore.LookupEntry(follower.PacketInfo.CurrentBuildingID);
                 if (!followerBuilding)
                     return false;
-                return followerBuilding->BuildingType == int32(secondaryAsset);
+                return followerBuilding->BuildingType == secondaryAsset;
             });
             if (followerCount < 1)
                 return false;
@@ -2499,7 +2499,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                     continue;
 
                 GarrBuildingEntry const* building = sGarrBuildingStore.LookupEntry(plot->BuildingInfo.PacketInfo->GarrBuildingID);
-                if (!building || building->UpgradeLevel < reqValue || building->BuildingType != int32(secondaryAsset))
+                if (!building || building->UpgradeLevel < reqValue || building->BuildingType != secondaryAsset)
                     continue;
 
                 return true;
@@ -2563,7 +2563,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                     continue;
 
                 GarrBuildingEntry const* building = sGarrBuildingStore.LookupEntry(plot->BuildingInfo.PacketInfo->GarrBuildingID);
-                if (!building || building->UpgradeLevel != secondaryAsset || building->BuildingType != int32(reqValue))
+                if (!building || building->UpgradeLevel != secondaryAsset || building->BuildingType != reqValue)
                     continue;
 
                 return true;
@@ -3936,7 +3936,7 @@ bool CriteriaHandler::ModifierSatisfied(ModifierTreeEntry const* modifier, uint6
                 if (item->GetVisibleAppearanceModId(referencePlayer) == itemModifiedAppearance->ID)
                     return ItemSearchCallbackResult::Stop;
 
-                if (int32(item->GetEntry()) == itemModifiedAppearance->ItemID)
+                if (item->GetEntry() == itemModifiedAppearance->ItemID)
                     return ItemSearchCallbackResult::Stop;
 
                 return ItemSearchCallbackResult::Continue;
