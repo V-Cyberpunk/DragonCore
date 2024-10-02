@@ -183,6 +183,7 @@ struct TC_GAME_API LootItem
     GuidSet allowedGUIDs;
     ObjectGuid rollWinnerGUID;                              // Stores the guid of person who won loot, if his bags are full only he can see the item in loot list!
     uint8   count             : 8;
+    LootItemType type = LootItemType::Item;
     bool    is_looted         : 1;
     bool    is_blocked        : 1;
     bool    freeforall        : 1;                          // free for all
