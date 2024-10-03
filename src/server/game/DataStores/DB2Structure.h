@@ -615,7 +615,7 @@ struct CharacterLoadoutEntry
     Trinity::RaceMask<int64> RaceMask;
     int8 ChrClassID;
     int32 Purpose;
-    uint8 ItemContext;
+    int8 ItemContext;
 
     bool IsForNewCharacter() const { return Purpose == 9; }
 };
@@ -1896,7 +1896,7 @@ struct GarrFollowerEntry
     uint8 AllianceGarrFollRaceID;
     int32 HordeGarrClassSpecID;
     int32 AllianceGarrClassSpecID;
-    int8 Quality;
+    uint8 Quality;
     uint8 FollowerLevel;
     uint16 ItemLevelWeapon;
     uint16 ItemLevelArmor;
@@ -4388,7 +4388,7 @@ struct TraitNodeEntry
     uint32 TraitTreeID;
     int32 PosX;
     int32 PosY;
-    int8 Type;
+    uint8 Type;
     int32 Flags;
 
     TraitNodeType GetType() const { return static_cast<TraitNodeType>(Type); }

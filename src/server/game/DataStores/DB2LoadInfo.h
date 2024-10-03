@@ -887,7 +887,7 @@ struct CharacterLoadoutLoadInfo
         { true, FT_LONG, "RaceMask" },
         { true, FT_BYTE, "ChrClassID" },
         { true, FT_INT, "Purpose" },
-        { false, FT_BYTE, "ItemContext" },
+        { true, FT_BYTE, "ItemContext" },
     };
 
     static constexpr DB2LoadInfo Instance{ Fields, 5, &CharacterLoadoutMeta::Instance, HOTFIX_SEL_CHARACTER_LOADOUT };
@@ -2249,7 +2249,7 @@ struct GarrFollowerLoadInfo
         { false, FT_BYTE, "AllianceGarrFollRaceID" },
         { true, FT_INT, "HordeGarrClassSpecID" },
         { true, FT_INT, "AllianceGarrClassSpecID" },
-        { true, FT_BYTE, "Quality" },
+        { false, FT_BYTE, "Quality" },
         { false, FT_BYTE, "FollowerLevel" },
         { false, FT_SHORT, "ItemLevelWeapon" },
         { false, FT_SHORT, "ItemLevelArmor" },
@@ -5598,7 +5598,7 @@ struct SpellReagentsLoadInfo
     static constexpr DB2FieldMeta Fields[34] =
     {
         { false, FT_INT, "ID" },
-        { false, FT_INT, "SpellID" },
+        { true, FT_INT, "SpellID" },
         { true, FT_INT, "Reagent1" },
         { true, FT_INT, "Reagent2" },
         { true, FT_INT, "Reagent3" },
@@ -6147,7 +6147,7 @@ struct TraitNodeLoadInfo
         { false, FT_INT, "TraitTreeID" },
         { true, FT_INT, "PosX" },
         { true, FT_INT, "PosY" },
-        { true, FT_BYTE, "Type" },
+        { false, FT_BYTE, "Type" },
         { true, FT_INT, "Flags" },
     };
 
