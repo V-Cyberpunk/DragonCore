@@ -49,7 +49,7 @@ ALTER TABLE `spell_reagents_currency` MODIFY `SpellID` int UNSIGNED NOT NULL DEF
 ALTER TABLE `trait_cond` MODIFY `TraitTreeID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `CondType`;
 ALTER TABLE `trait_currency_source` MODIFY `TraitCurrencyID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `ID`;
 ALTER TABLE `trait_definition_effect_points` MODIFY `TraitDefinitionID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `ID`;
-ALTER TABLE `trait_edge` MODIFY `LeftTraitNodeID` isnt UNSIGNED NOT NULL DEFAULT 0 AFTER `VisualStyle`;
+ALTER TABLE `trait_edge` MODIFY `LeftTraitNodeID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `VisualStyle`;
 ALTER TABLE `trait_node` MODIFY `TraitTreeID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `ID`;
 ALTER TABLE `trait_node` MODIFY `Type` tinyint UNSIGNED NOT NULL DEFAULT 0 AFTER `PosY`;
 ALTER TABLE `trait_node_entry_x_trait_cond` MODIFY `TraitNodeEntryID` int UNSIGNED NOT NULL DEFAULT 0 AFTER `TraitCondID`;
