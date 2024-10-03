@@ -2990,13 +2990,13 @@ struct ModifiedCraftingReagentSlotEntry
     int32 Field_9_0_1_33978_001;
     int32 PlayerConditionID;
     int32 ReagentType;
-    int8 Field_10_0_2_46091_005;
+    uint8 Field_10_0_2_46091_005;
 };
 
 struct ModifiedCraftingSpellSlotEntry
 {
     uint32 ID;
-    int32 SpellID;
+    uint32 SpellID;
     int32 Slot;
     int32 ModifiedCraftingReagentSlotID;
     int32 Field_9_0_1_35679_003;
