@@ -1882,7 +1882,7 @@ DROP TABLE IF EXISTS `characters`;
 CREATE TABLE `characters` (
   `guid` bigint unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier',
   `account` int unsigned NOT NULL DEFAULT '0' COMMENT 'Account Identifier',
-  `name` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL,
+  `name` varchar(12) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL,
   `slot` tinyint unsigned NOT NULL DEFAULT '0',
   `race` tinyint unsigned NOT NULL DEFAULT '0',
   `class` tinyint unsigned NOT NULL DEFAULT '0',
@@ -1981,9 +1981,9 @@ CREATE TABLE `characters` (
   `personalTabardBorderColor` int NOT NULL DEFAULT '-1',
   `personalTabardBackgroundColor` int NOT NULL DEFAULT '-1',
   PRIMARY KEY (`guid`),
+  UNIQUE KEY `idx_name` (`name`),
   KEY `idx_account` (`account`),
-  KEY `idx_online` (`online`),
-  KEY `idx_name` (`name`)
+  KEY `idx_online` (`online`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='Player System';
 /*!40101 SET character_set_client = @saved_cs_client */;
 
