@@ -1,8 +1,8 @@
 -- Add missing spawns and pooling for Tattered Chest ID: 2846 in Bloodmyst Isle
 SET @POOLID := 0;
-SELECT @POOLID := MAX(entry) FROM pool_template;
+SELECT @POOLID := MAX(entry) FROM `pool_template`;
 SET @OGUID := 0;
-SELECT @OGUID := MAX(guid) FROM gameobject;
+SELECT @OGUID := MAX(guid) FROM `gameobject`;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+27;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnDifficulties`, `phaseUseFlags`, `PhaseId`, `PhaseGroup`, `terrainSwapMap`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES

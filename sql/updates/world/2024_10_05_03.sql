@@ -1,15 +1,15 @@
 -- Add missing spawns and pooling for Tattered Chest ID: 2845 in Eversong Woods
 SET @POOLID := 0;
-SELECT @POOLID := MAX(entry) FROM pool_template;
+SELECT @POOLID := MAX(entry) FROM `pool_template`;
 SET @OGUID := 0;
-SELECT @OGUID := MAX(guid) FROM gameobject;
+SELECT @OGUID := MAX(guid) FROM `gameobject`;
 
 DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID+0 AND @OGUID+27;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnDifficulties`, `phaseUseFlags`, `PhaseId`, `PhaseGroup`, `terrainSwapMap`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
-(@OGUID+0, 2845, 530, 3430, 3460 8846.802734375, -5709.845703125, 0.462978005409240722, 1.239183306694030761, 0, 0, 0.580702781677246093, 0.814115643501281738, 360, 255, 1, 40892), -- Golden Strand
+(@OGUID+0, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8846.802734375, -5709.845703125, 0.462978005409240722, 1.239183306694030761, 0, 0, 0.580702781677246093, 0.814115643501281738, 360, 255, 1, 40892), -- Golden Strand
 (@OGUID+1, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8782.2021484375, -5750.22265625, 0.406792014837265014, 2.059488296508789062, 0, 0, 0.857167243957519531, 0.515038192272186279, 360, 255, 1, 40892), -- Golden Strand
 (@OGUID+2, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8878.2138671875, -5732.53857421875, 0.232910007238388061, 3.543023586273193359, 0, 0, -0.97992420196533203, 0.199370384216308593, 360, 255, 1, 45854), -- Golden Strand
-(@OGUID+3, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8676.185546875, -5694.66162109375, 0.725703001022338867, 4.572763919830322265, 0, 0, -0.75470924377441406, 0.656059443950653076, 360, 255, 1, 45854); -- Golden Strand
+(@OGUID+3, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8676.185546875, -5694.66162109375, 0.725703001022338867, 4.572763919830322265, 0, 0, -0.75470924377441406, 0.656059443950653076, 360, 255, 1, 45854), -- Golden Strand
 (@OGUID+4, 2845, 530, 3430, 3460, "", 0, 0, 0, -1, 8771.9091796875, -5683.58349609375, 0.120685003697872161, 3.124123096466064453, 0, 0, 0.99996185302734375, 0.008734640665352344, 360, 255, 1, 45854), -- Golden Strand
 (@OGUID+5, 2845, 530, 3430, 3911, "", 0, 0, 0, -1, 9090.8916015625, -5863.84619140625, 0.349002987146377563, 4.956737518310546875, 0, 0, -0.61566066741943359, 0.788011372089385986, 360, 255, 1, 40892), -- Tranquil Shore
 (@OGUID+6, 2845, 530, 3430, 3911, "", 0, 0, 0, -1, 9034.2119140625, -5864.50634765625, 0.089702002704143524, 0.698131442070007324, 0, 0, 0.342020034790039062, 0.939692676067352294, 360, 255, 1, 40892), -- Tranquil Shore
@@ -50,7 +50,7 @@ INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES
 (@POOLID+8,1,'Tattered Chest (2845), Eversong Woods, Chest Pool Scorched Grove and Runestones');
 
 DELETE FROM `pool_members` WHERE `poolSpawnId` BETWEEN @POOLID AND @POOLID+8;
-INSERT INTO `pool_members` (`type`,`spawnId`,`poolSpawnId`,`chance`,`description`) Values
+INSERT INTO `pool_members` (`type`,`spawnId`,`poolSpawnId`,`chance`,`description`) VALUES
 (1,12105,@POOLID,0,'Tattered Chest (2845), Golden Strand'),
 (1,@OGUID,@POOLID,0,'Tattered Chest (2845), Golden Strand'),
 (1,@OGUID+1,@POOLID,0,'Tattered Chest (2845), Golden Strand'),
