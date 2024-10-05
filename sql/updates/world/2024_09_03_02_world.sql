@@ -4,8 +4,10 @@ DELETE FROM `creature` WHERE `guid` = 62000000002001338;
 
 SET @CGUID := 0;
 SELECT @CGUID := MAX(guid) FROM creature;
+SELECT @CGUID := @CGUID+1;
 SET @GOGUID := 0;
 SELECT @GOGUID := MAX(guid) FROM gameobject;
+SELECT @GOGUID := @GOGUID+1;
 
 -- Chromie's Hourglass
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `zoneId`, `areaId`, `spawnDifficulties`, `PhaseId`, `PhaseGroup`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `VerifiedBuild`) VALUES
