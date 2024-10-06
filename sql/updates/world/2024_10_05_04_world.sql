@@ -21,6 +21,7 @@ INSERT INTO `pool_template` (`entry`,`max_limit`,`description`) VALUES
 
 DELETE FROM `pool_members` WHERE `poolSpawnId`=@POOLID;
 INSERT INTO `pool_members` (`type`,`spawnId`,`poolSpawnId`,`chance`,`description`) Values
+(1,27542,@POOLID,0,'Large Battered Chest (75293), Deatholme'),
 (1,@OGUID,@POOLID,0,'Large Battered Chest (75293), Deatholme'),
 (1,@OGUID+1,@POOLID,0,'Large Battered Chest (75293), Deatholme'),
 (1,@OGUID+2,@POOLID,0,'Large Battered Chest (75293), Deatholme');
