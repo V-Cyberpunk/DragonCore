@@ -1041,6 +1041,7 @@ uint32 DB2Manager::LoadStores(std::string const& dataPath, LocaleConstant defaul
     // Check loaded DB2 files proper version
     if (!sAreaTableStore.LookupEntry(15151) ||               // last area added in 10.2.5 (53007)
         !sCharTitlesStore.LookupEntry(805) ||                // last char title added in 10.2.5 (53007)
+        !sFlightCapabilityStore.LookupEntry(1) ||            // default flight capability (required)
         !sGemPropertiesStore.LookupEntry(4081) ||            // last gem property added in 10.2.5 (53007)
         !sItemStore.LookupEntry(215160) ||                   // last item added in 10.2.5 (53007)
         !sItemExtendedCostStore.LookupEntry(8510) ||         // last item extended cost added in 10.2.5 (53007)
