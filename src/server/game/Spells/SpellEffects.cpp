@@ -2996,6 +2996,11 @@ void Spell::EffectScriptEffect()
         {
             switch (m_spellInfo->Id)
             {
+                case 83958: ///< Mobile Banking
+                {
+                    m_caster->CastSpell(m_caster, 88304, true);
+                    break;
+                }
                 // Shadow Flame (All script effects, not just end ones to prevent player from dodging the last triggered spell)
                 case 22539:
                 case 22972:
@@ -3021,6 +3026,25 @@ void Spell::EffectScriptEffect()
                     // Shadow Flame
                     m_caster->CastSpell(unitTarget, 22682, this);
                     return;
+                }
+                case 29830: // Mirren's Drinking Hat
+                {
+                    uint32 item = 0;
+                    switch (urand(1, 6))
+                    {
+                    case 1:
+                    case 2:
+                    case 3:
+                        item = 23584; break;            ///< Loch Modan Lager
+                    case 4:
+                    case 5:
+                        item = 23585; break;            ///< Stouthammer Lite
+                    case 6:
+                        item = 23586; break;            ///< Aerie Peak Pale Ale
+                    }
+                    if (item)
+                        DoCreateItem(item);
+                    break;
                 }
                 // Mug Transformation
                 case 41931:

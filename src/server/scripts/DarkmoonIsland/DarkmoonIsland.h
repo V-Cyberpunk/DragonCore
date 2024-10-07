@@ -21,6 +21,7 @@
 enum darkmoonIslandQuests
 {
     QUEST_WHACK_A_GNOLL         = 29463,
+    QUEST_FIREBIRDS_CHALLENGE   = 36481,
     QUEST_HUMANOID_CANNONBALL   = 29436,
     QUEST_TARGET_TURTLE         = 29455,
     QUEST_HE_SHOOTS_HE_SCORES   = 29438,
@@ -31,6 +32,11 @@ enum darkmoonIslandQuests
 enum darkmoonIslandItems
 {
     ITEM_DARKMOON_TOKEN         = 71083
+};
+
+enum darkmoonIslandAchievement
+{
+    ACHIEVEMENT_BLOOD_OF_ALYSRAZOR = 9252
 };
 
 enum darkmoonIslandSpells
