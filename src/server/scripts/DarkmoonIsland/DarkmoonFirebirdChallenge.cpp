@@ -167,9 +167,8 @@ public:
                 // Info
             case GOSSIP_ACTION_INFO_DEF + 1:
                 player->PlayerTalkClass->ClearMenus();
-                AddGossipItemFor(player, 16972, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+                AddGossipItemFor(player, 16972, 0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
                 SendGossipMenuFor(player, 24704, me->GetGUID());
-                return true;
                 break;
                 // Ready to play
             case  GOSSIP_ACTION_INFO_DEF + 2:
@@ -179,8 +178,6 @@ public:
 
                     player->DestroyItemCount(ITEM_DARKMOON_TOKEN, 1, true);
                     player->CastSpell(player, WINGS_OF_FLAME_START, true);
-
-                    return true;
                 }
                 break;
                 // I understand
@@ -238,38 +235,6 @@ public:
     }
 };
 
-// Wings of Flame trigerred - 170820 (This script checks the conditions to get the achievement)
-class spell_darkmoon_firebird_challenge_check_trigger_achieve : public SpellScript
-{
-    PrepareSpellScript(spell_darkmoon_firebird_challenge_check_trigger_achieve);
-
-    void HandleAfterHit()
-    {
-        Unit* target = GetCaster();
-
-        if (!target)
-            return;
-
-        if (Aura* shootAura = target->GetAura(BLAZING_RING))
-        {
-
-            Player* pl = GetCaster()->ToPlayer();
-
-            if (shootAura->GetStackAmount() >= 50)
-            {
-                AchievementEntry const* achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_BLOOD_OF_ALYSRAZOR);
-                if (pl)
-                    pl->CompletedAchievement(achiev);
-            }
-        }
-    }
-
-    void Register() override
-    {
-        OnHit += SpellHitFn(spell_darkmoon_firebird_challenge_check_trigger_achieve::HandleAfterHit);
-    }
-};
-
 // Firebird Challenge - Wings of flame (trigger) 170819
 class spell_darkmoon_firebird_challenge : public SpellScriptLoader
 {
@@ -294,19 +259,6 @@ public:
             {
                 caster->CastSpell(spawnPoint, SUMMON_RINGS_AT, true);
             }
-
-            /*if (Aura* shootAura = caster->GetAura(BLAZING_RING))
-            {
-
-                Player* pl = GetCaster()->ToPlayer();
-
-                if (shootAura->GetStackAmount() == 50)
-                {
-                    AchievementEntry const* achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_BLOOD_OF_ALYSRAZOR);
-                    if (pl)
-                        pl->CompletedAchievement(achiev);
-                }
-            }*/
         }
 
         void Register() override
@@ -359,9 +311,13 @@ public:
 
                 if (shootAura->GetStackAmount() >= 50)
                 {
-                    AchievementEntry const* achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_BLOOD_OF_ALYSRAZOR);
-                    if (pl)
-                        pl->CompletedAchievement(achiev);
+                    if (!pl->HasAchieved(ACHIEVEMENT_BLOOD_OF_ALYSRAZOR))
+                    {
+
+                        AchievementEntry const* achiev = sAchievementStore.LookupEntry(ACHIEVEMENT_BLOOD_OF_ALYSRAZOR);
+                        if (pl)
+                            pl->CompletedAchievement(achiev);
+                    }
                 }
             }
         }
@@ -377,7 +333,6 @@ void AddSC_darkmoon_firebird_challenge()
 {
     new npc_ziggie_sparks();
     new spell_darkmoon_firebird_challenge_check_trigger();
-    new spell_darkmoon_firebird_challenge_check_trigger_achieve();
     new spell_darkmoon_firebird_challenge();
     new at_darkmoon_firebird_ring();
 };
