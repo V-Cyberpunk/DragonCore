@@ -279,15 +279,14 @@ class npc_whack_gnoll_barrel : public CreatureScript
     public:
         npc_whack_gnoll_barrel() : CreatureScript("npc_whack_gnoll_barrel") { }
 
-        CreatureAI* GetAI(Creature* pCreature) const override
+        CreatureAI* GetAI(Creature* Creature) const override
         {
-            return new npc_whack_gnoll_barrelAI(pCreature);
+            return new npc_whack_gnoll_barrelAI(Creature);
         }
 
         struct npc_whack_gnoll_barrelAI : ScriptedAI
         {
-            npc_whack_gnoll_barrelAI(Creature* pCreature) : ScriptedAI(pCreature)
-            {}
+            npc_whack_gnoll_barrelAI(Creature* Creature) : ScriptedAI(Creature) {}
 
             void Reset() override
             {

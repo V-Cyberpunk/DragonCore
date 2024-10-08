@@ -18,6 +18,7 @@
 #ifndef DARKMOON_ISLAND_H
 #define DARKMOON_ISLAND_H
 
+//QUEST
 enum darkmoonIslandQuests
 {
     QUEST_WHACK_A_GNOLL         = 29463,
@@ -29,19 +30,30 @@ enum darkmoonIslandQuests
     QUEST_TONK_COMMANDER        = 29434,
 };
 
+//ITEMS
 enum darkmoonIslandItems
 {
     ITEM_DARKMOON_TOKEN         = 71083
 };
 
+//ACHIEVEMENT
 enum darkmoonIslandAchievement
 {
     ACHIEVEMENT_BLOOD_OF_ALYSRAZOR = 9252
 };
 
+//SPELLS
 enum darkmoonIslandSpells
 {
-    SPELL_WHEE                  = 46668
+    SPELL_WHEE                  = 46668,
+
+    // Firebirds Challenge spell
+    WINGS_OF_FLAME_START        = 170819,
+    WINGS_OF_FLAME_AURA         = 170820,
+    BLAZING_RING                = 170823,
+    SUMMON_RINGS_AT             = 170815,
+    SLOW_FALL                   = 130,
+
 };
 
 enum darkmoonIslandGameObjects
