@@ -928,3 +928,18 @@ void WorldSession::HandleSpawnTrackingUpdate(WorldPackets::Quest::SpawnTrackingU
 
     SendPacket(response.Write());
 }
+
+void WorldSession::HandleQueryTreasurePicker(WorldPackets::Quest::QueryTreasurePicker& queryTreasurePicker)
+{
+    Quest const* questInfo = sObjectMgr->GetQuestTemplate(queryTreasurePicker.QuestID);
+    if (!questInfo)
+        return;
+
+    WorldPackets::Quest::TreasurePickerResponse treasurePickerResponse;
+    treasurePickerResponse.QuestID = queryTreasurePicker.QuestID;
+    treasurePickerResponse.TreasurePickerID = queryTreasurePicker.TreasurePickerID;
+
+    // TODO: Missing treasure picker implementation
+
+    _player->SendDirectMessage(treasurePickerResponse.Write());
+}
