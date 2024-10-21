@@ -59,12 +59,12 @@ INSERT INTO `creature_addon` (`guid`, `PathId`, `mount`, `StandState`, `AnimTier
 (@CGUID+10, 0, 0, 1, 0, 1, 1, 0, 0, 0, 0, 0, 0, '94223'); -- Snuff - 94223 - Generic Quest Invisibility 25
 
 -- Quests
-DELETE FROM `ui_map_quest_line` WHERE (`QuestLineId`=550 AND `UIMapId` IN (85,76));
-INSERT INTO `ui_map_quest_line` (`UIMapId`, `QuestLineId`, `VerifiedBuild`) VALUES
+DELETE FROM `ui_map_quest_lines` WHERE (`QuestLineId`=550 AND `UIMapId` IN (85,76));
+INSERT INTO `ui_map_quest_lines` (`UIMapId`, `QuestLineId`, `VerifiedBuild`) VALUES
 (85, 550, 56819),
 (76, 550, 56819);
 
-UPDATE `ui_map_quest_line` SET `VerifiedBuild`=56819 WHERE (`UIMapId`=85 AND `QuestLineId` IN (5593,5538,5519,5513,5504,5482,5459,5389,5387,1311,1295,1289,1129,1107,1003,973,919,860,802,796,780,636,574,546,539,531,516,377,300,290,263,261,260,612));
+UPDATE `ui_map_quest_lines` SET `VerifiedBuild`=56819 WHERE (`UIMapId`=85 AND `QuestLineId` IN (5593,5538,5519,5513,5504,5482,5459,5389,5387,1311,1295,1289,1129,1107,1003,973,919,860,802,796,780,636,574,546,539,531,516,377,300,290,263,261,260,612));
 
 UPDATE `quest_poi` SET `VerifiedBuild`=56819 WHERE (`QuestID`=60964 AND `BlobIndex`=0 AND `Idx1`=1) OR (`QuestID`=60964 AND `BlobIndex`=0 AND `Idx1`=0) OR (`QuestID`=29612 AND `BlobIndex`=0 AND `Idx1`=2) OR (`QuestID`=29612 AND `BlobIndex`=0 AND `Idx1`=1) OR (`QuestID`=29612 AND `BlobIndex`=0 AND `Idx1`=0) OR (`QuestID`=60126 AND `BlobIndex`=0 AND `Idx1`=1) OR (`QuestID`=60126 AND `BlobIndex`=0 AND `Idx1`=0) OR (`QuestID`=49538 AND `BlobIndex`=0 AND `Idx1`=1) OR (`QuestID`=49538 AND `BlobIndex`=0 AND `Idx1`=0) OR (`QuestID`=29611 AND `BlobIndex`=0 AND `Idx1`=2) OR (`QuestID`=29611 AND `BlobIndex`=0 AND `Idx1`=1) OR (`QuestID`=29611 AND `BlobIndex`=0 AND `Idx1`=0);
 UPDATE `quest_poi_points` SET `VerifiedBuild`=56819 WHERE (`QuestID`=60964 AND `Idx1`=1 AND `Idx2`=0) OR (`QuestID`=60964 AND `Idx1`=0 AND `Idx2`=0) OR (`QuestID`=29612 AND `Idx1`=2 AND `Idx2`=0) OR (`QuestID`=29612 AND `Idx1`=1 AND `Idx2`=0) OR (`QuestID`=29612 AND `Idx1`=0 AND `Idx2`=0) OR (`QuestID`=60126 AND `Idx1`=1 AND `Idx2`=0) OR (`QuestID`=60126 AND `Idx1`=0 AND `Idx2`=0) OR (`QuestID`=49538 AND `Idx1`=1 AND `Idx2`=0) OR (`QuestID`=49538 AND `Idx1`=0 AND `Idx2`=0) OR (`QuestID`=29611 AND `Idx1`=2 AND `Idx2`=0) OR (`QuestID`=29611 AND `Idx1`=1 AND `Idx2`=0) OR (`QuestID`=29611 AND `Idx1`=0 AND `Idx2`=0);
