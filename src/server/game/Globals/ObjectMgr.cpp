@@ -4326,7 +4326,7 @@ void ObjectMgr::LoadPlayerInfo()
                 if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_LEGION && class_ == CLASS_DEMON_HUNTER)
                     continue;
 
-                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_DRAGONFLIGHT && class_ == CLASS_EVOKER)
+                if (sWorld->getIntConfig(CONFIG_EXPANSION) < EXPANSION_DRAGONFLIGHT && (class_ == CLASS_EVOKER || race == RACE_DRACTHYR_ALLIANCE || race == RACE_DRACTHYR_HORDE))
                     continue;
 
                 // fatal error if no level 1 data
