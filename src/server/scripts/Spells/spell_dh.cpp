@@ -536,7 +536,7 @@ class spell_dh_vengeful_bonds : public SpellScript
 {
     bool Validate(SpellInfo const* /*spellInfo*/) override
     {
-        return ValidateSpellInfo({ SPELL_DH_VENGEFUL_BONDS, SPELL_DH_VENGEFUL_RETREAT_SNARE });
+        return ValidateSpellInfo({ SPELL_DH_VENGEFUL_BONDS, SPELL_DH_VENGEFUL_RETREAT });
     }
 
     bool Load() override
@@ -546,7 +546,7 @@ class spell_dh_vengeful_bonds : public SpellScript
 
     void HandleScript(SpellEffIndex /*effIndex*/)
     {
-        GetCaster()->CastSpell(GetCaster(), SPELL_DH_VENGEFUL_RETREAT_SNARE, CastSpellExtraArgs()
+        GetCaster()->CastSpell(GetCaster(), SPELL_DH_VENGEFUL_RETREAT, CastSpellExtraArgs()
             .SetTriggeringSpell(GetSpell())
             .SetTriggerFlags(TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR));
     }
