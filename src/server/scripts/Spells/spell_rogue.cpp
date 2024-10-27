@@ -51,6 +51,9 @@ enum RogueSpells
     //SPELL_ROGUE_DEATH_FROM_ABOVE                    = 152150, // dropped in BfA
     SPELL_ROGUE_GRAND_MELEE                         = 193358,
     SPELL_ROGUE_GRAPPLING_HOOK                      = 195457,
+    SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH      = 392401,
+    SPELL_ROGUE_IMPROVED_GARROTE_STEALTH            = 392403,
+    SPELL_ROGUE_IMPROVED_GARROTE_TALENT             = 381632,
     SPELL_ROGUE_IMPROVED_SHIV                       = 319032,
     SPELL_ROGUE_KILLING_SPREE                       = 51690,
     SPELL_ROGUE_KILLING_SPREE_TELEPORT              = 57840,
@@ -283,6 +286,48 @@ class spell_rog_eviscerate : public SpellScript
     }
 };
 
+// 703 - Garrote
+class spell_rog_garrote : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH,
+            SPELL_ROGUE_IMPROVED_GARROTE_STEALTH,
+            SPELL_ROGUE_IMPROVED_GARROTE_TALENT,
+        });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_ROGUE_IMPROVED_GARROTE_TALENT);
+    }
+
+    void CalculateDamage(AuraEffect const* /*aurEff*/, Unit const* /*victim*/, int32& /*damage*/, int32& /*flatMod*/, float& pctMod)
+    {
+        if (!_snapshottedPctMod.has_value())
+        {
+            if (AuraEffect const* improvedGarroteStealth = GetCaster()->GetAuraEffect(SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH, EFFECT_1))
+                AddPct(pctMod, improvedGarroteStealth->GetAmount());
+            else if (AuraEffect const* improvedGarroteAfterStealth = GetCaster()->GetAuraEffect(SPELL_ROGUE_IMPROVED_GARROTE_STEALTH, EFFECT_1))
+                AddPct(pctMod, improvedGarroteAfterStealth->GetAmount());
+
+            _snapshottedPctMod.emplace(pctMod);
+        }
+        else
+            pctMod = *_snapshottedPctMod;
+    }
+
+    void Register() override
+    {
+        DoEffectCalcDamageAndHealing += AuraEffectCalcDamageFn(spell_rog_garrote::CalculateDamage, EFFECT_0, SPELL_AURA_PERIODIC_DAMAGE);
+    }
+
+private:
+    Optional<float> _snapshottedPctMod;
+};
+
 // 193358 - Grand Melee
 class spell_rog_grand_melee : public AuraScript
 {
@@ -343,6 +388,52 @@ class spell_rog_honor_among_thieves : public AuraScript
     void Register() override
     {
         OnEffectProc += AuraEffectProcFn(spell_rog_honor_among_thieves::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
+// Called by 1784 - Stealth
+class spell_rog_improved_garrote : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo(
+        {
+            SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH,
+            SPELL_ROGUE_IMPROVED_GARROTE_STEALTH,
+            SPELL_ROGUE_IMPROVED_GARROTE_TALENT,
+        });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_ROGUE_IMPROVED_GARROTE_TALENT);
+    }
+
+    void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+
+        target->RemoveAurasDueToSpell(SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH); // Prevent to have both auras at the same time
+        target->CastSpell(target, SPELL_ROGUE_IMPROVED_GARROTE_STEALTH, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringAura = aurEff
+        });
+    }
+
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        Unit* target = GetTarget();
+
+        target->RemoveAurasDueToSpell(SPELL_ROGUE_IMPROVED_GARROTE_STEALTH);
+        target->CastSpell(target, SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR
+        });
+    }
+
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_improved_garrote::HandleEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_rog_improved_garrote::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -992,8 +1083,10 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_deadly_poison);
     RegisterSpellScript(spell_rog_envenom);
     RegisterSpellScript(spell_rog_eviscerate);
+    RegisterSpellScript(spell_rog_garrote);
     RegisterSpellScript(spell_rog_grand_melee);
     RegisterSpellScript(spell_rog_honor_among_thieves);
+    RegisterSpellScript(spell_rog_improved_garrote);
     RegisterSpellScript(spell_rog_improved_shiv);
     RegisterSpellAndAuraScriptPair(spell_rog_killing_spree, spell_rog_killing_spree_aura);
     RegisterSpellScript(spell_rog_kingsbane);
