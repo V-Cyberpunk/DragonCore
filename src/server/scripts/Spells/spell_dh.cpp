@@ -170,7 +170,7 @@ enum DemonHunterSpells
     SPELL_DH_THROW_GLAIVE                          = 185123,
     SPELL_DH_UNCONTAINED_FEL                       = 209261,
     SPELL_DH_VENGEFUL_BONDS                        = 320635,
-    SPELL_DH_VENGEFUL_RETREAT_SNARE                = 198813,
+    SPELL_DH_VENGEFUL_RETREAT                      = 198813,
     SPELL_DH_VENGEFUL_RETREAT_TRIGGER              = 198793,
 };
 
@@ -513,6 +513,24 @@ class spell_dh_soul_furnace_conduit : public AuraScript
     }
 };
 
+// 198813 - Vengeful Retreat
+class spell_dh_vengeful_retreat_damage : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DH_VENGEFUL_BONDS });
+    }
+    void HandleVengefulBonds(std::list<WorldObject*>& targets)
+    {
+        if (!GetCaster()->HasAura(SPELL_DH_VENGEFUL_BONDS))
+            targets.clear();
+    }
+    void Register() override
+    {
+        OnObjectAreaTargetSelect += SpellObjectAreaTargetSelectFn(spell_dh_vengeful_retreat_damage::HandleVengefulBonds, EFFECT_0, TARGET_UNIT_SRC_AREA_ENEMY);
+    }
+};
+
 // 320635 - Vengeful Bonds called by 198793 - Vengeful Retreat
 class spell_dh_vengeful_bonds : public SpellScript
 {
@@ -549,6 +567,7 @@ void AddSC_demon_hunter_spell_scripts()
     new areatrigger_dh_generic_sigil<SPELL_DH_SIGIL_OF_FLAME_AOE>("areatrigger_dh_sigil_of_flame");
     RegisterAreaTriggerAI(areatrigger_dh_sigil_of_chains);
     RegisterSpellScript(spell_dh_sigil_of_chains);
+    RegisterSpellScript(spell_dh_vengeful_retreat_damage);
 
     // Havoc
 
