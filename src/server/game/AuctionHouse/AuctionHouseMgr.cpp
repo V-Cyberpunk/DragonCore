@@ -959,7 +959,7 @@ void AuctionHouseObject::AddAuction(CharacterDatabaseTransaction trans, AuctionP
         }
     }
 
-    bucket->QualityMask |= static_cast<AuctionHouseFilterMask>(1 << (quality + 4));
+    bucket->QualityMask |= static_cast<AuctionHouseFilterMask>(AsUnderlyingType(AuctionHouseFilterMask::PoorQuality) << quality);
     ++bucket->QualityCounts[quality];
 
     if (trans)
@@ -1061,7 +1061,7 @@ std::map<uint32, AuctionPosting>::node_type AuctionHouseObject::RemoveAuction(Ch
         }
 
         if (!--bucket->QualityCounts[quality])
-            bucket->QualityMask &= static_cast<AuctionHouseFilterMask>(~(1 << (quality + 4)));
+            bucket->QualityMask &= static_cast<AuctionHouseFilterMask>(AsUnderlyingType(AuctionHouseFilterMask::PoorQuality) << quality);
     }
     else
     {
@@ -1221,7 +1221,7 @@ void AuctionHouseObject::BuildListBuckets(WorldPackets::AuctionHouse::AuctionLis
                 {
                     if (ItemModifiedAppearanceEntry const* itemModifiedAppearance = sItemModifiedAppearanceStore.LookupEntry(bucketAppearance.first))
                     {
-                        if (knownAppearanceIds.find(itemModifiedAppearance->ItemAppearanceID) == knownAppearanceIds.end())
+                        if (!knownAppearanceIds.contains(itemModifiedAppearance->ItemAppearanceID))
                         {
                             hasAll = false;
                             break;
@@ -1272,6 +1272,13 @@ void AuctionHouseObject::BuildListBuckets(WorldPackets::AuctionHouse::AuctionLis
 
             // cannot learn caged pets whose level exceeds highest level of currently owned pet
             if (bucketData->MinBattlePetLevel && bucketData->MinBattlePetLevel > maxKnownPetLevel)
+                continue;
+        }
+
+        if (filters.HasFlag(AuctionHouseFilterMask::CurrentExpansionOnly))
+        {
+            ItemTemplate const* itemTemplate = ASSERT_NOTNULL(sObjectMgr->GetItemTemplate(bucket.first.ItemId));
+            if (itemTemplate->GetRequiredExpansion() != sWorld->getIntConfig(CONFIG_EXPANSION))
                 continue;
         }
 
