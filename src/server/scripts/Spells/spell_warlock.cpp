@@ -385,12 +385,13 @@ class spell_warl_demonbolt : public SpellScript
     {
         return ValidateSpellInfo ({ SPELL_WARLOCK_DEMONBOLT_ENERGIZE });
     }
-
-    void HandleAfterCast()
+    void HandleAfterCast() const
     {
-        GetCaster()->CastSpell(GetCaster(), SPELL_WARLOCK_DEMONBOLT_ENERGIZE, true);
+        GetCaster()->CastSpell(GetCaster(), SPELL_WARLOCK_DEMONBOLT_ENERGIZE, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringSpell = GetSpell()
+        });
     }
-
     void Register() override
     {
         AfterCast += SpellCastFn(spell_warl_demonbolt::HandleAfterCast);
