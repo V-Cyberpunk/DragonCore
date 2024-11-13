@@ -57,6 +57,8 @@ enum EvokerSpells
     SPELL_EVOKER_PYRE_DAMAGE                    = 357212,
     SPELL_EVOKER_SCOURING_FLAME                 = 378438,
     SPELL_EVOKER_SOAR_RACIAL                    = 369536,
+    SPELL_EVOKER_VERDANT_EMBRACE_HEAL           = 361195,
+    SPELL_EVOKER_VERDANT_EMBRACE_JUMP           = 373514,
     SPELL_VISAGE                                = 372014,
     SPELL_ALTERED_FORM                          = 97709,
     SPELL_HATRED                                = 118328,
@@ -434,6 +436,59 @@ class spell_evo_cosmic_visage : public SpellScript
     }
 };
 
+// 360995 - Verdant Embrace (Green)
+class spell_evo_verdant_embrace : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo ({ SPELL_EVOKER_VERDANT_EMBRACE_HEAL, SPELL_EVOKER_VERDANT_EMBRACE_JUMP });
+    }
+
+    void HandleLaunchTarget(SpellEffIndex /*effIndex*/)
+    {
+        Unit* caster = GetCaster();
+        Unit* target = GetHitUnit();
+
+        if (target == caster)
+            caster->CastSpell(caster, SPELL_EVOKER_VERDANT_EMBRACE_HEAL, CastSpellExtraArgsInit{
+                .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+                .TriggeringSpell = GetSpell()
+            });
+        else
+            caster->CastSpell(target, SPELL_EVOKER_VERDANT_EMBRACE_JUMP, CastSpellExtraArgsInit{
+                .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+                .TriggeringSpell = GetSpell()
+            });
+    }
+
+    void Register() override
+    {
+        OnEffectLaunchTarget += SpellEffectFn(spell_evo_verdant_embrace::HandleLaunchTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
+// 396557 - Verdant Embrace
+class spell_evo_verdant_embrace_trigger_heal : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo ({ SPELL_EVOKER_VERDANT_EMBRACE_HEAL });
+    }
+
+    void HandleHitTarget(SpellEffIndex /*effIndex*/)
+    {
+        GetHitUnit()->CastSpell(GetExplTargetUnit(), SPELL_EVOKER_VERDANT_EMBRACE_HEAL, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringSpell = GetSpell()
+        });
+    }
+
+    void Register() override
+    {
+        OnEffectHitTarget += SpellEffectFn(spell_evo_verdant_embrace_trigger_heal::HandleHitTarget, EFFECT_0, SPELL_EFFECT_DUMMY);
+    }
+};
+
 void AddSC_evoker_spell_scripts()
 {
     RegisterSpellScript(spell_evo_azure_strike);
@@ -446,6 +501,8 @@ void AddSC_evoker_spell_scripts()
     RegisterSpellScript(spell_evo_permeating_chill);
     RegisterSpellScript(spell_evo_pyre);
     RegisterSpellScript(spell_evo_scouring_flame);
+    RegisterSpellScript(spell_evo_verdant_embrace);
+    RegisterSpellScript(spell_evo_verdant_embrace_trigger_heal);
 
     //new
     RegisterSpellScript(spell_evo_soar);
