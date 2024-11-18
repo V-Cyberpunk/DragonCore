@@ -87,7 +87,7 @@ public:
         }
         else if (GameObject const* gameObject = object->ToGameObject())
         {
-            uint16 dynFlags = 0;
+            uint16 dynFlags = GO_DYNFLAG_LO_STATE_TRANSITION_ANIM_DONE;
             uint16 pathProgress = 0xFFFF;
             switch (gameObject->GetGoType())
             {
