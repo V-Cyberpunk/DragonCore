@@ -703,16 +703,10 @@ class spell_dk_festering_strike : public SpellScript
 // 195621 - Frost Fever
 class spell_dk_frost_fever_proc : public AuraScript
 {
-    bool Validate(SpellInfo const* spellInfo) override
-    {
-        return ValidateSpellEffect({ { spellInfo->Id, EFFECT_0 } });
-    }
-
     bool CheckProc(AuraEffect const* aurEff, ProcEventInfo const& /*eventInfo*/) const
     {
         return roll_chance_i(aurEff->GetAmount());
     }
-
     void Register() override
     {
         DoCheckEffectProc += AuraCheckEffectProcFn(spell_dk_frost_fever_proc::CheckProc, EFFECT_0, SPELL_AURA_PROC_TRIGGER_SPELL);
