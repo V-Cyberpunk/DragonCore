@@ -81,6 +81,7 @@ enum DeathKnightSpells
     SPELL_DK_PILLAR_OF_FROST                    = 51271,
     SPELL_DK_RAISE_DEAD_SUMMON                  = 52150,
     SPELL_DK_REAPER_OF_SOULS_PROC               = 469172,
+    SPELL_DK_RUNIC_CORRUPTION                   = 51460,
     SPELL_DK_RECENTLY_USED_DEATH_STRIKE         = 180612,
     SPELL_DK_RUNIC_CORRUPTION                   = 51460,
     SPELL_DK_RUNIC_POWER_ENERGIZE               = 49088,
