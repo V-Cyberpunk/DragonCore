@@ -59,7 +59,6 @@ enum RogueSpells
     SPELL_ROGUE_DEADLY_POISON                       = 2823,
     SPELL_ROGUE_DEADLY_POISON_DEBUFF                = 2818,
     SPELL_ROGUE_DEADLY_POISON_INSTANT_DAMAGE        = 113780,
-    //SPELL_ROGUE_DEATH_FROM_ABOVE                    = 152150, // dropped in BfA
     SPELL_ROGUE_GRAND_MELEE                         = 193358,
     SPELL_ROGUE_GRAPPLING_HOOK                      = 195457,
     SPELL_ROGUE_IMPROVED_GARROTE_AFTER_STEALTH      = 392401,
@@ -75,13 +74,12 @@ enum RogueSpells
     SPELL_ROGUE_LEECHING_POISON_TALENT              = 280716,
     SPELL_ROGUE_LEECHING_POISON_AURA                = 108211,
     SPELL_ROGUE_MARKED_FOR_DEATH                    = 137619,
-    //SPELL_ROGUE_MASTER_OF_SUBTLETY_DAMAGE_PERCENT   = 31665, // dropped in BfA
-    //SPELL_ROGUE_MASTER_OF_SUBTLETY_PASSIVE          = 31223, // dropped in BfA
     SPELL_ROGUE_MAIN_GAUCHE                         = 86392,
     SPELL_ROGUE_NUMBING_POISON                      = 5761,
     SPELL_ROGUE_NUMBING_POISON_DEBUFF               = 5760,
     SPELL_ROGUE_PREMEDITATION_PASSIVE               = 343160,
     SPELL_ROGUE_PREMEDITATION_AURA                  = 343173,
+    SPELL_ROGUE_PREMEDITATION_ENERGIZE              = 343170,
     SPELL_ROGUE_PREY_ON_THE_WEAK_TALENT             = 131511,
     SPELL_ROGUE_PREY_ON_THE_WEAK                    = 255909,
     SPELL_ROGUE_RUTHLESS_PRECISION                  = 193357,
@@ -837,6 +835,49 @@ class spell_rog_restless_blades : public AuraScript
     }
 };
 
+// Called by 1784 - Stealth
+class spell_rog_premeditation : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_PREMEDITATION_PASSIVE, SPELL_ROGUE_PREMEDITATION_AURA });
+    }
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_ROGUE_PREMEDITATION_PASSIVE);
+    }
+    void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_ROGUE_PREMEDITATION_AURA, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringAura = aurEff
+        });
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_premeditation::HandleEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+// 343173 - Premeditation (proc)
+class spell_rog_premeditation_proc : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_PREMEDITATION_ENERGIZE });
+    }
+    void HandleProc(AuraEffect* aurEff, ProcEventInfo& /*procInfo*/)
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_ROGUE_PREMEDITATION_ENERGIZE, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringAura = aurEff
+        });
+    }
+    void Register() override
+    {
+        OnEffectProc += AuraEffectProcFn(spell_rog_premeditation_proc::HandleProc, EFFECT_0, SPELL_AURA_DUMMY);
+    }
+};
+
 // 315508 - Roll the Bones
 class spell_rog_roll_the_bones : public SpellScript
 {
@@ -993,6 +1034,35 @@ private:
     bool _hasPremeditationAura = false;
 };
 
+// Called by 1784 - Stealth and 185313 - Shadow Dance
+class spell_rog_shadow_focus : public AuraScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_ROGUE_SHADOW_FOCUS, SPELL_ROGUE_SHADOW_FOCUS_EFFECT });
+    }
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_ROGUE_SHADOW_FOCUS);
+    }
+    void HandleEffectApply(AuraEffect const* aurEff, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->CastSpell(GetTarget(), SPELL_ROGUE_SHADOW_FOCUS_EFFECT, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringAura = aurEff
+        });
+    }
+    void HandleEffectRemove(AuraEffect const* /*aurEff*/, AuraEffectHandleModes /*mode*/)
+    {
+        GetTarget()->RemoveAurasDueToSpell(SPELL_ROGUE_SHADOW_FOCUS_EFFECT);
+    }
+    void Register() override
+    {
+        AfterEffectApply += AuraEffectApplyFn(spell_rog_shadow_focus::HandleEffectApply, EFFECT_1, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+        AfterEffectRemove += AuraEffectRemoveFn(spell_rog_shadow_focus::HandleEffectRemove, EFFECT_1, SPELL_AURA_ANY, AURA_EFFECT_HANDLE_REAL);
+    }
+};
+
 // 193315 - Sinister Strike
 class spell_rog_sinister_strike : public SpellScript
 {
@@ -1057,7 +1127,6 @@ class spell_rog_stealth : public AuraScript
     {
         Unit* target = GetTarget();
 
-        target->RemoveAurasDueToSpell(SPELL_ROGUE_SHADOW_FOCUS_EFFECT);
         target->RemoveAurasDueToSpell(SPELL_ROGUE_STEALTH_STEALTH_AURA);
         target->RemoveAurasDueToSpell(SPELL_ROGUE_STEALTH_SHAPESHIFT_AURA);
     }
@@ -1065,7 +1134,7 @@ class spell_rog_stealth : public AuraScript
     void Register() override
     {
          AfterEffectApply += AuraEffectApplyFn(spell_rog_stealth::HandleEffectApply, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
-        AfterEffectRemove += AuraEffectRemoveFn(spell_rog_stealth::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
+         AfterEffectRemove += AuraEffectRemoveFn(spell_rog_stealth::HandleEffectRemove, EFFECT_1, SPELL_AURA_DUMMY, AURA_EFFECT_HANDLE_REAL);
     }
 };
 
@@ -1314,12 +1383,15 @@ void AddSC_rogue_spell_scripts()
     RegisterSpellScript(spell_rog_mastery_main_gauche);
     RegisterSpellScript(spell_rog_pickpocket);
     RegisterSpellScript(spell_rog_poisoned_knife);
+    RegisterSpellScript(spell_rog_premeditation);
+    RegisterSpellScript(spell_rog_premeditation_proc);
     RegisterSpellScript(spell_rog_prey_on_the_weak);
     RegisterSpellScript(spell_rog_restless_blades);
     RegisterSpellScript(spell_rog_roll_the_bones);
     RegisterSpellScript(spell_rog_rupture);
     RegisterSpellScript(spell_rog_ruthlessness);
     RegisterSpellScript(spell_rog_shadowstrike);
+    RegisterSpellScript(spell_rog_shadow_focus);
     RegisterSpellScript(spell_rog_sinister_strike);
     RegisterSpellScript(spell_rog_soothing_darkness);
     RegisterSpellScript(spell_rog_stealth);
