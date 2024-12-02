@@ -169,6 +169,8 @@ enum DemonHunterSpells
     SPELL_DH_SPIRIT_BOMB_DAMAGE                    = 218677,
     SPELL_DH_SPIRIT_BOMB_HEAL                      = 227255,
     SPELL_DH_SPIRIT_BOMB_VISUAL                    = 218678,
+    SPELL_DH_TACTICAL_RETREAT_ENERGIZE             = 389890,
+    SPELL_DH_TACTICAL_RETREAT_TALENT               = 389688,
     SPELL_DH_THROW_GLAIVE                          = 185123,
     SPELL_DH_UNCONTAINED_FEL                       = 209261,
     SPELL_DH_VENGEFUL_BONDS                        = 320635,
@@ -671,6 +673,33 @@ struct areatrigger_dh_sigil_of_chains : AreaTriggerAI
             caster->CastSpell(at->GetPosition(), SPELL_DH_SIGIL_OF_CHAINS_VISUAL);
             caster->CastSpell(at->GetPosition(), SPELL_DH_SIGIL_OF_CHAINS_TARGET_SELECT);
         }
+    }
+};
+
+// Called by 198793 - Vengeful Retreat
+class spell_dh_tactical_retreat : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DH_TACTICAL_RETREAT_TALENT, SPELL_DH_TACTICAL_RETREAT_ENERGIZE });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_DH_TACTICAL_RETREAT_TALENT);
+    }
+
+    void Energize() const
+    {
+        GetCaster()->CastSpell(GetCaster(), SPELL_DH_TACTICAL_RETREAT_ENERGIZE, CastSpellExtraArgsInit{
+            .TriggerFlags = TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR,
+            .TriggeringSpell = GetSpell()
+        });
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_dh_tactical_retreat::Energize);
     }
 };
 
