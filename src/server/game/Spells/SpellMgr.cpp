@@ -5068,6 +5068,12 @@ void SpellMgr::LoadSpellInfoCorrections()
         });
     });
 
+    // Eye Beam
+    ApplySpellFix({ 198030 }, [](SpellInfo* spellInfo)
+    {
+        spellInfo->_LoadSqrtTargetLimit(5, 0, {}, {});
+    });
+
     for (SpellInfo const& s : mSpellInfoMap)
     {
         SpellInfo* spellInfo = &const_cast<SpellInfo&>(s);
