@@ -183,7 +183,7 @@ inline void KillRewarder::_RewardKillCredit(Player* player)
     {
         if (Creature* target = _victim->ToCreature())
         {
-            player->KilledMonster(target);
+            player->KilledMonster(target->GetCreatureTemplate(), target->GetGUID());
             player->UpdateCriteria(CriteriaType::KillAnyCreature, target->GetCreatureType(), 1, 0, target);
         }
     }

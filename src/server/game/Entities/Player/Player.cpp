@@ -16927,13 +16927,12 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 /*count*/)
     UpdateVisibleObjectInteractions(true, false, false, true);
 }
 
-void Player::KilledMonster(Creature const* creature)
+void Player::KilledMonster(CreatureTemplate const* cInfo, ObjectGuid guid)
 {
-    ASSERT(creature);
+    ASSERT(cInfo);
 
-    CreatureTemplate const* cInfo = creature->GetCreatureTemplate();
-
-    KilledMonsterCredit(cInfo->Entry, creature->GetGUID());
+    if (cInfo->Entry)
+        KilledMonsterCredit(cInfo->Entry, guid);
 
     for (uint8 i = 0; i < MAX_KILL_CREDIT; ++i)
         if (cInfo->KillCredit[i])
