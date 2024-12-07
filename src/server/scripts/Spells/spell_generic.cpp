@@ -5563,7 +5563,6 @@ class spell_make_camp : public SpellScript
         float y = caster->GetPositionY();
         float z = caster->GetPositionZ();
         float o = caster->GetOrientation();
-        uint32 m = caster->GetMapId();
         // Tente: 292769
         // Sac: 276247
         // campfire: 301125

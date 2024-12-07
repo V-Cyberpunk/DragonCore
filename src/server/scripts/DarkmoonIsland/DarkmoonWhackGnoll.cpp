@@ -188,6 +188,7 @@ class npc_whack_gnoll_bunny : public CreatureScript
                             {
                                 Creature* doll =  barrel->SummonCreature(NPC_DOLL, barrel->GetPosition(), TEMPSUMMON_TIMED_DESPAWN, 6s);
                                 barrel->CastSpell(barrel, SPELL_SPAWN_VISUAL, false);
+                                barrel->AddAura(SPELL_OK_TO_HIT, doll);
                             }
 
                             events.ScheduleEvent(EVENT_SUMMON_DOLL, 6s);
