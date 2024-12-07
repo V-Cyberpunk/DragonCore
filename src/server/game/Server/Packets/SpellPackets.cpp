@@ -1077,6 +1077,15 @@ WorldPacket const* MountResult::Write()
     return &_worldPacket;
 }
 
+WorldPacket const* ApplyMountEquipmentResult::Write()
+{
+    _worldPacket << ItemGUID;
+    _worldPacket << int32(ItemID);
+    _worldPacket << Bits<1>(Result);
+    _worldPacket.FlushBits();
+    return &_worldPacket;
+}
+
 WorldPacket const* MissileCancel::Write()
 {
     _worldPacket << OwnerGUID;
