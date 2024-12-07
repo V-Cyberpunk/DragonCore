@@ -65,6 +65,7 @@ enum DemonHunterSpells
     SPELL_DH_CONSUME_SOUL_VENGEANCE                = 208014,
     SPELL_DH_CONSUME_SOUL_VENGEANCE_DEMON          = 210050,
     SPELL_DH_CONSUME_SOUL_VENGEANCE_SHATTERED      = 210047,
+    SPELL_DH_CYCLE_OF_HATRED                       = 258887,
     SPELL_DH_DARKNESS_ABSORB                       = 209426,
     SPELL_DH_DEMON_BLADES_DMG                      = 203796,
     SPELL_DH_DEMON_SPIKES                          = 203819,
@@ -272,6 +273,31 @@ class spell_dh_charred_warblades : public AuraScript
     }
 private:
     uint32 _healAmount = 0;
+};
+
+// Called by 188499 - Blade Dance, 162794 - Chaos Strike and 342817 - Glaive Tempest
+class spell_dh_cycle_of_hatred : public SpellScript
+{
+    bool Validate(SpellInfo const* /*spellInfo*/) override
+    {
+        return ValidateSpellInfo({ SPELL_DH_CYCLE_OF_HATRED });
+    }
+
+    bool Load() override
+    {
+        return GetCaster()->HasAura(SPELL_DH_CYCLE_OF_HATRED);
+    }
+
+    void Energize() const
+    {
+        if (AuraEffect* aurEff = GetCaster()->GetAuraEffect(SPELL_DH_CYCLE_OF_HATRED, EFFECT_0))
+            GetCaster()->GetSpellHistory()->ModifyCooldown(SPELL_DH_EYE_BEAM, -Milliseconds(aurEff->GetAmount()));
+    }
+
+    void Register() override
+    {
+        AfterCast += SpellCastFn(spell_dh_cycle_of_hatred::Energize);
+    }
 };
 
 // 209426 - Darkness
@@ -830,6 +856,7 @@ void AddSC_demon_hunter_spell_scripts()
     RegisterSpellScript(spell_dh_chaos_strike);
     RegisterSpellScript(spell_dh_chaotic_transformation);
     RegisterSpellScript(spell_dh_charred_warblades);
+    RegisterSpellScript(spell_dh_cycle_of_hatred);
     RegisterSpellScript(spell_dh_darkness);
     RegisterSpellScript(spell_dh_eye_beam);
     RegisterSpellScript(spell_dh_fel_devastation);
