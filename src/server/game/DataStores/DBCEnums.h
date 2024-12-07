@@ -1776,6 +1776,8 @@ enum class MountFlags : int32
     DisablePlayerMountPreview               = 0x00001000,
 };
 
+DEFINE_ENUM_FLAG(MountFlags);
+
 enum class PathPropertyIndex : uint8
 {
     UseNewLiquidGenerateCode    = 0,
