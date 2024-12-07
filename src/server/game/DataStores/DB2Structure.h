@@ -1132,6 +1132,13 @@ struct CreatureFamilyEntry
     std::array<int16, 2> SkillLine;
 };
 
+struct CreatureLabelEntry
+{
+    uint32 ID;
+    int32 LabelID;
+    uint32 CreatureDifficultyID;
+};
+
 struct CreatureModelDataEntry
 {
     uint32 ID;
@@ -1805,6 +1812,13 @@ struct GameObjectDisplayInfoEntry
     int32 AlternateDisplayType;
     int32 ClientCreatureDisplayInfoID;
     int32 ClientItemID;
+};
+
+struct GameObjectLabelEntry
+{
+    uint32 ID;
+    int32 LabelID;
+    uint32 GameObjectID;
 };
 
 struct GameObjectsEntry
