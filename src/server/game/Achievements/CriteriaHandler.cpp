@@ -1230,7 +1230,6 @@ bool CriteriaHandler::IsCompletedCriteria(Criteria const* criteria, uint64 requi
         case CriteriaType::BuyItemsFromVendors:
         case CriteriaType::SellItemsToVendors:
         case CriteriaType::GainLevels:
-        case CriteriaType::ReachRenownLevel:
         case CriteriaType::LearnTaxiNode:
             return progress->Counter >= requiredAmount;
         case CriteriaType::EarnAchievement:
@@ -1623,7 +1622,6 @@ bool CriteriaHandler::RequirementsSatisfied(Criteria const* criteria, uint64 mis
                 return false;
             break;
         case CriteriaType::CurrencyGained:
-        case CriteriaType::ReachRenownLevel:
             if (!miscValue1 || !miscValue2 || int64(miscValue2) < 0
                 || miscValue1 != uint32(criteria->Entry->Asset.CurrencyID))
                 return false;
@@ -4483,8 +4481,6 @@ char const* CriteriaMgr::GetCriteriaTypeString(CriteriaType type)
             return "CompleteQuestsCountOnAccount";
         case CriteriaType::WarbandBankTabPurchased:
             return "WarbandBankTabPurchased";
-        case CriteriaType::ReachRenownLevel:
-            return "ReachRenownLevel";
         case CriteriaType::LearnTaxiNode:
             return "LearnTaxiNode";
         default:
