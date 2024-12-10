@@ -20,6 +20,7 @@
 
 #include "IoContext.h"
 #include "Optional.h"
+#include <algorithm>
 #include <boost/asio/ip/tcp.hpp>
 #include <string>
 
