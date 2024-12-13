@@ -20,6 +20,7 @@
 
 #include "Define.h"
 #include "DatabaseEnvFwd.h"
+#include <unordered_map>
 #include <vector>
 
 class TC_DATABASE_API ResultSet
