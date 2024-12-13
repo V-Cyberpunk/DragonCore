@@ -400,10 +400,12 @@ _result(result),
 _fields(fields)
 {
     _fieldMetadata.resize(_fieldCount);
+    _fieldIndexByAlias.reserve(_fieldCount);
     _currentRow = new Field[_fieldCount];
     for (uint32 i = 0; i < _fieldCount; i++)
     {
         InitializeDatabaseFieldMetadata(&_fieldMetadata[i], &_fields[i], i, false);
+        _fieldIndexByAlias.emplace(std::make_pair(_fieldMetadata[i].Alias, i));
         _currentRow[i].SetMetadata(&_fieldMetadata[i]);
     }
 }
@@ -631,6 +633,14 @@ Field const& ResultSet::operator[](std::size_t index) const
 {
     ASSERT(index < std::size_t(_fieldCount));
     return _currentRow[index];
+}
+
+Field const& ResultSet::operator[](std::string_view alias) const
+{
+    auto itr = _fieldIndexByAlias.find(alias);
+    ASSERT(itr != _fieldIndexByAlias.end());
+    ASSERT(itr->second < std::size_t(_fieldCount));
+    return _currentRow[itr->second];
 }
 
 QueryResultFieldMetadata const& ResultSet::GetFieldMetadata(std::size_t index) const

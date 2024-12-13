@@ -35,11 +35,13 @@ class TC_DATABASE_API ResultSet
 
         Field* Fetch() const { return _currentRow; }
         Field const& operator[](std::size_t index) const;
+        Field const& operator[](std::string_view alias) const;
 
         QueryResultFieldMetadata const& GetFieldMetadata(std::size_t index) const;
 
     protected:
         std::vector<QueryResultFieldMetadata> _fieldMetadata;
+        std::unordered_map<std::string_view, std::size_t> _fieldIndexByAlias;
         uint64 _rowCount;
         Field* _currentRow;
         uint32 _fieldCount;
