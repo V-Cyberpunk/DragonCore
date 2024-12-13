@@ -652,10 +652,10 @@ Field const& PreparedResultSet::operator[](std::size_t index) const
     return m_rows[std::size_t(m_rowPosition) * m_fieldCount + index];
 }
 
-Field const& PreparedResultSet::operator[](std::string_view fieldName) const
+Field const& PreparedResultSet::operator[](std::string_view fieldAlias) const
 {
     ASSERT(m_rowPosition < m_rowCount);
-    auto itr = m_fieldIndexByAlias.find(fieldName);
+    auto itr = m_fieldIndexByAlias.find(fieldAlias);
     ASSERT(itr != m_fieldIndexByAlias.end());
     ASSERT(itr->second < std::size_t(m_fieldCount));
     return m_rows[std::size_t(m_rowPosition) * m_fieldCount + itr->second];
