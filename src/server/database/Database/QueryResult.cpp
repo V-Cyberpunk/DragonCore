@@ -452,6 +452,7 @@ m_metadataResult(result)
     //- This is where we prepare the buffer based on metadata
     MySQLField* field = reinterpret_cast<MySQLField*>(mysql_fetch_fields(m_metadataResult));
     m_fieldMetadata.resize(m_fieldCount);
+    m_fieldIndexByAlias.reserve(m_fieldCount);
     std::size_t rowSize = 0;
     for (uint32 i = 0; i < m_fieldCount; ++i)
     {
@@ -459,6 +460,7 @@ m_metadataResult(result)
         rowSize += size;
 
         InitializeDatabaseFieldMetadata(&m_fieldMetadata[i], &field[i], i, true);
+        m_fieldIndexByAlias.emplace(std::make_pair(m_fieldMetadata[i].Alias, i));
 
         m_rBind[i].buffer_type = field[i].type;
         m_rBind[i].buffer_length = size;
@@ -648,6 +650,15 @@ Field const& PreparedResultSet::operator[](std::size_t index) const
     ASSERT(m_rowPosition < m_rowCount);
     ASSERT(index < std::size_t(m_fieldCount));
     return m_rows[std::size_t(m_rowPosition) * m_fieldCount + index];
+}
+
+Field const& PreparedResultSet::operator[](std::string_view fieldName) const
+{
+    ASSERT(m_rowPosition < m_rowCount);
+    auto itr = m_fieldIndexByAlias.find(fieldName);
+    ASSERT(itr != m_fieldIndexByAlias.end());
+    ASSERT(itr->second < std::size_t(m_fieldCount));
+    return m_rows[std::size_t(m_rowPosition) * m_fieldCount + itr->second];
 }
 
 QueryResultFieldMetadata const& PreparedResultSet::GetFieldMetadata(std::size_t index) const
