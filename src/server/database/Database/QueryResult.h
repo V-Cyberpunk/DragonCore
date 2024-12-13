@@ -70,7 +70,7 @@ class TC_DATABASE_API PreparedResultSet
 
     protected:
         std::vector<QueryResultFieldMetadata> m_fieldMetadata;
-        std::unordered_map<std::string_view, size_t> m_fieldIndexByAlias;
+        std::unordered_map<std::string_view, std::size_t> m_fieldIndexByAlias;
         std::vector<Field> m_rows;
         uint64 m_rowCount;
         uint64 m_rowPosition;
