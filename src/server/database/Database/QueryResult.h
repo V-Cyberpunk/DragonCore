@@ -65,7 +65,7 @@ class TC_DATABASE_API PreparedResultSet
 
         Field* Fetch() const;
         Field const& operator[](std::size_t index) const;
-        Field const& operator[](std::string_view fieldAlias) const;
+        Field const& operator[](std::string_view alias) const;
 
         QueryResultFieldMetadata const& GetFieldMetadata(std::size_t index) const;
 
