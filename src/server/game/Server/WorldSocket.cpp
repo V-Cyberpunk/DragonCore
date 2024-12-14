@@ -787,16 +787,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<WorldPackets::Auth::
         return;
     }
 
-    // Must be done before WorldSession is created
-    bool wardenActive = sWorld->getBoolConfig(CONFIG_WARDEN_ENABLED);
-    if (wardenActive && account.Game.OS != "Win" && account.Game.OS != "Wn64" && account.Game.OS != "Mc64")
-    {
-        SendAuthResponseError(ERROR_DENIED);
-        TC_LOG_ERROR("network", "WorldSocket::HandleAuthSession: Client {} attempted to log in using invalid client OS ({}).", address, account.Game.OS);
-        DelayedCloseSocket();
-        return;
-    }
-
     if (IpLocationRecord const* location = sIPLocation->GetLocationRecord(address))
         _ipCountry = location->CountryCode;
 
@@ -878,10 +868,6 @@ void WorldSocket::HandleAuthSessionCallback(std::shared_ptr<WorldPackets::Auth::
     _authed = true;
     _worldSession = new WorldSession(account.Game.Id, std::move(authSession->RealmJoinTicket), account.BattleNet.Id, shared_from_this(), account.Game.Security,
         account.Game.Expansion, mutetime, account.Game.OS, account.Game.TimezoneOffset, account.Game.Build, account.Game.Locale, account.Game.Recruiter, account.Game.IsRectuiter);
-
-    // Initialize Warden system only if it is enabled by config
-    if (wardenActive)
-        _worldSession->InitWarden(_sessionKey);
 
     _queryProcessor.AddCallback(_worldSession->LoadPermissionsAsync().WithPreparedCallback([this](PreparedQueryResult result)
     {
