@@ -1192,6 +1192,8 @@ public:
         else                                                    // item_id or [name] Shift-click form |color|Hitem:item_id:0:0:0|h[name]|h|r
         {
             Trinity::Hyperlinks::HyperlinkInfo info = Trinity::Hyperlinks::ParseSingleHyperlink(args);
+            // if (!info)
+            //     return false;
 
             if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
                 return false;
@@ -1205,14 +1207,14 @@ public:
             if (!id)
                 return false;
 
-            if(!info)
-                itemId = Trinity::StringTo<uint32>(id).value_or(0);
-            else
+            if(info)
             {
                 itemId = itemLinkData.Item->GetId();
                 bonusListIDs = itemLinkData.ItemBonusListIDs;
                 itemContext = ItemContext(itemLinkData.Context);
             }
+            else
+                itemId = Trinity::StringTo<uint32>(id).value_or(0);
         }
 
         char const* ccount = strtok(nullptr, " ");
@@ -1375,6 +1377,8 @@ public:
         else                                                    // item_id or [name] Shift-click form |color|Hitem:item_id:0:0:0|h[name]|h|r
         {
             Trinity::Hyperlinks::HyperlinkInfo info = Trinity::Hyperlinks::ParseSingleHyperlink(tailArgs);
+            // if (!info)
+            //     return false;
 
             if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
                 return false;
@@ -1388,14 +1392,14 @@ public:
             if (!id)
                 return false;
 
-            if(!info)
-                itemId = Trinity::StringTo<uint32>(id).value_or(0);
-            else
+            if(info)
             {
                 itemId = itemLinkData.Item->GetId();
                 bonusListIDs = itemLinkData.ItemBonusListIDs;
                 itemContext = ItemContext(itemLinkData.Context);
             }
+            else
+                itemId = Trinity::StringTo<uint32>(id).value_or(0);
         }
 
         char const* ccount = strtok(nullptr, " ");
