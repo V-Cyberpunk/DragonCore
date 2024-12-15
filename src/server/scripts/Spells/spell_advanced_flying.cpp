@@ -156,6 +156,7 @@ private:
 
 // 374763 - Lift off
 // 372610 - Skyward Ascent (Dragonriding)
+// 386451 - Skyward Ascent (Drakhtyr)
 class spell_af_skyward_ascent : public SpellScript
 {
     void HandleHitTarget(SpellEffIndex effIndex)
@@ -174,6 +175,7 @@ class spell_af_skyward_ascent : public SpellScript
 };
 
 // 372608 - Surge Forward
+// 386449 - Surge Forward (Drakhtyr)
 class spell_af_surge_forward : public SpellScript
 {
     void HandleHitTarget(SpellEffIndex /*effIndex*/)

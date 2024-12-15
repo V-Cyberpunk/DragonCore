@@ -25,6 +25,8 @@
 #include "DB2Stores.h"
 #include "Player.h"
 #include "ScriptMgr.h"
+#include "AreaTrigger.h"
+#include "AreaTriggerAI.h"
 #include "Spell.h"
 #include "SpellAuraEffects.h"
 #include "SpellHistory.h"
@@ -410,8 +412,6 @@ class spell_evo_soar : public SpellScript
 // 351239 - Visage (Racial)
 class spell_evo_cosmic_visage : public SpellScript
 {
-    PrepareSpellScript(spell_evo_cosmic_visage);
-
     void HandleOnCast()
     {
         Unit* caster = GetCaster();
@@ -490,6 +490,32 @@ class spell_evo_verdant_embrace_trigger_heal : public SpellScript
     }
 };
 
+// 359073 - Eternity Surge
+class spell_evo_eternity_surge : public SpellScript
+{
+    void OnComplete(int32 completedStageCount) const
+    {
+        GetCaster()->CastSpell(GetExplTargetUnit(), 359077, CastSpellExtraArgs()
+            .SetTriggeringSpell(GetSpell())
+            .SetTriggerFlags(TRIGGERED_IGNORE_CAST_IN_PROGRESS | TRIGGERED_DONT_REPORT_CAST_ERROR));
+    }
+    void Register() override
+    {
+        OnEmpowerCompleted += SpellOnEmpowerStageCompletedFn(spell_evo_eternity_surge::OnComplete);
+    }
+};
+
+// areatrigger 23318 - need sniff data on db
+struct at_evo_emerald_blossom : AreaTriggerAI
+{
+    at_evo_emerald_blossom(AreaTrigger* at) : AreaTriggerAI(at) { }
+    void OnRemove() override
+    {
+        if (Unit* caster = at->GetCaster())
+            caster->CastSpell(at->GetPosition(), 355916);
+    }
+};
+
 void AddSC_evoker_spell_scripts()
 {
     RegisterSpellScript(spell_evo_azure_strike);
@@ -508,4 +534,6 @@ void AddSC_evoker_spell_scripts()
     //new
     RegisterSpellScript(spell_evo_soar);
     RegisterSpellScript(spell_evo_cosmic_visage);
+    RegisterSpellScript(spell_evo_eternity_surge);
+    RegisterAreaTriggerAI(at_evo_emerald_blossom);
 }
