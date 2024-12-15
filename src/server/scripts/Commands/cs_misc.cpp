@@ -1195,19 +1195,19 @@ public:
             // if (!info)
             //     return false;
 
-            if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
-                return false;
+            // if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
+            //     return false;
 
             Trinity::Hyperlinks::ItemLinkData itemLinkData;
-            if (!Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
-                return false;
+            // if (!Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
+            //     return false;
 
             // Keep this line in order to remove HItem link from args for lower "strtok"
             char const* id = handler->extractKeyFromLink((char*)args, "Hitem");
-            if (!id)
-                return false;
+            // if (!id)
+            //     return false;
 
-            if(info)
+            if(Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
             {
                 itemId = itemLinkData.Item->GetId();
                 bonusListIDs = itemLinkData.ItemBonusListIDs;
@@ -1380,19 +1380,19 @@ public:
             // if (!info)
             //     return false;
 
-            if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
-                return false;
+            // if (info.tag != Trinity::Hyperlinks::LinkTags::item::tag())
+            //     return false;
 
             Trinity::Hyperlinks::ItemLinkData itemLinkData;
-            if (!Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
-                return false;
+            // if (!Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
+            //     return false;
 
             // Keep this line in order to remove HItem link from args for lower "strtok"
             char const* id = handler->extractKeyFromLink(tailArgs, "Hitem");
-            if (!id)
-                return false;
+            // if (!id)
+            //     return false;
 
-            if(info)
+            if(Trinity::Hyperlinks::LinkTags::item::StoreTo(itemLinkData, info.data))
             {
                 itemId = itemLinkData.Item->GetId();
                 bonusListIDs = itemLinkData.ItemBonusListIDs;
